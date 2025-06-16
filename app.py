@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import sqlite3
 
-app = Flask(_name_)
+app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 # Database setup
@@ -49,6 +49,6 @@ def logout():
     session.pop('admin', None)
     return redirect('/login')
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     init_db()
     app.run(debug=True)
