@@ -1,0 +1,303 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0f0f0f;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+/* Header */
+header {
+  background-color: #1a1a1a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 40px;
+  margin-right: 10px;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
+
+nav ul li a {
+  color: #ff3c3c;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+nav ul li a:hover {
+  color: #ffffff;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(#111, #222);
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* About Section */
+.about {
+  background: #1f1f1f;
+  padding: 60px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.about h2 {
+  font-size: 2.5rem;
+  color: #ff3c3c;
+  margin-bottom: 20px;
+}
+
+.about p {
+  color: #ccc;
+  padding: 0 20px;
+  margin-bottom: 15px;
+}
+
+/* Services Section */
+#services {
+  background: #141414;
+  padding: 50px 20px;
+}
+
+#services h2 {
+  text-align: center;
+  color: #ff3c3c;
+  margin-bottom: 30px;
+}
+
+.services {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 20px;
+}
+
+.service-category {
+  background: #2a2a2a;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+}
+
+.service-category h3 {
+  color: #ff3c3c;
+  margin-bottom: 10px;
+}
+
+.service-category p {
+  margin-bottom: 10px;
+  color: #ccc;
+}
+
+.service-category ul {
+  padding-left: 20px;
+}
+
+.service-category ul li {
+  margin-bottom: 5px;
+  list-style-type: disc;
+  color: #bbb;
+}
+
+/* Portfolio */
+#portfolio {
+  background: #1b1b1b;
+  padding: 50px 20px;
+}
+
+#portfolio h2 {
+  text-align: center;
+  color: #ff3c3c;
+  margin-bottom: 30px;
+}
+
+.portfolio-entry {
+  text-align: center;
+  color: #ccc;
+  margin-bottom: 30px;
+}
+
+.portfolio-entry img,
+.portfolio-entry video {
+  max-width: 100%;
+  border-radius: 10px;
+  margin-top: 15px;
+}
+
+/* Team */
+#team {
+  background: #1b1b1b;
+  padding: 50px 20px;
+  text-align: center;
+}
+#team h2 {
+  text-align: center;
+  color: #ff3c3c;
+  margin-bottom: 30px;
+}
+
+.team-member {
+  margin-bottom: 30px;
+}
+
+.team-member img {
+  border-radius: 50%;
+  margin-top: 10px;
+}
+
+/* Blog */
+#blog {
+  background: #1b1b1b;
+  padding: 50px 20px;
+}
+
+#blog h2 {
+  text-align: center;
+  color: #ff3c3c;
+  margin-bottom: 30px;
+}
+
+#blog article {
+  background: #2e2e2e;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+#blog article h3 {
+  color: #ff3c3c;
+}
+
+#blog article p {
+  color: #ccc;
+}
+
+#blog article a {
+  color: #25d366;
+}
+
+/* Contact */
+#contact {
+  background: #1f1f1f;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+#contact h2 {
+  color: #ff3c3c;
+  margin-bottom: 20px;
+}
+
+#contact ul {
+  list-style: none;
+  padding: 0;
+}
+
+#contact ul li {
+  margin: 10px 0;
+}
+
+#contact ul li a {
+  color: #25d366;
+  text-decoration: none;
+}
+
+/* Join Section */
+#join {
+  background: #141414;
+  padding: 60px 20px;
+  text-align: center;
+  color: #fff;
+}
+
+#join a.joinus-float {
+  display: inline-block;
+  margin-top: 20px;
+  background: #ff3c3c;
+  padding: 12px 20px;
+  border-radius: 25px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* WhatsApp Floating Button */
+.whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25D366;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 0 10px #25D366;
+  transition: background 0.3s ease;
+}
+
+.whatsapp-float:hover {
+  background: #1ebe5b;
+}
+
+/* Floating Join Button */
+.floating-btn {
+  background: #ff3c3c;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .services {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  nav ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .floating-btn,
+  .whatsapp-float {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+}

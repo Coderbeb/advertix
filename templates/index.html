@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advertix | Your Creative Marketing Solution</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    #home.hero{
+      background-image: url('background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: #fff;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <img src="logo.jpg" alt="Advertix Logo" />
+      <h1>Advertix</h1>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#portfolio">Portfolio</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <a href="#join" class="floating-btn">Join Us</a>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <h2>Advertix - Your Creative Marketing Solution</h2>
+    <p>Turning Ordinary Brands into Extraordinary Stories - On Ground and Online.</p>
+  </section>
+
+  <!-- About Us Section -->
+  <section class="about" id="about">
+    <h2>About Us</h2>
+    <p>At Advertix, we specialize in designing unique, impactful marketing campaigns that connect directly with your customers. From creative offline promotions - like branded water bottles, cups, and packaging - to powerful online strategies - social media, SEO, and more - we help businesses grow visibility, loyalty, and sales.</p>
+    <p>We blend creativity, practicality, and cost-efficiency to make sure you get maximum reach without exceeding your budget.</p>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services">
+    <h2>🔷 OUR SERVICES 🔷</h2>
+    <div class="services">
+      <div class="service-category">
+        <h3>1️⃣ Offline Marketing Solutions</h3>
+        <p>We bring your brand directly into the hands of your customers through customized products like cups, bottles, packaging, and promotional materials. Our team crafts high-impact physical branding that leaves a lasting impression.</p>
+        <ul>
+          <li>Labeling</li>
+          <li>Brand Promotion</li>
+          <li>Packaging</li>
+          <li>Physical Advertising Materials</li>
+        </ul>
+      </div>
+      <div class="service-category">
+        <h3>2️⃣ Online Marketing Services</h3>
+        <p>From social media campaigns and SEO strategies to content marketing and Google Ads, we help you build a strong online presence and engage effectively with your target audience across digital platforms.</p>
+        <ul>
+          <li>Social Media Campaigns</li>
+          <li>SEO</li>
+          <li>Content Marketing</li>
+          <li>Google Ads</li>
+        </ul>
+      </div>
+      <div class="service-category">
+        <h3>3️⃣ Branding & Visual Identity</h3>
+        <p>Your logo, color scheme, and brand style reflect your business’s essence. We work with you to create a powerful brand identity that makes you stand out in a competitive marketplace.</p>
+        <ul>
+          <li>Logo Design</li>
+          <li>Color Palettes</li>
+          <li>Typography</li>
+          <li>Brand Guidelines</li>
+        </ul>
+      </div>
+      <div class="service-category">
+        <h3>4️⃣ Creative Strategy</h3>
+        <p>We combine data, creativity, and consumer psychology to design compelling campaigns that capture attention, spark engagement, and drive real results.</p>
+        <ul>
+          <li>Consumer Research</li>
+          <li>Ad Strategy</li>
+          <li>Concept Development</li>
+          <li>Campaign Execution</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Portfolio Section -->
+  <section id="portfolio">
+    <h2>Our Portfolio</h2>
+    {% for entry in portfolio_entries %}
+    <div class="portfolio-entry">
+      <h3>{{ entry.title }}</h3>
+      <p>{{ entry.description }}</p>
+      {% if entry.image %}<img src="{{ entry.image }}" alt="{{ entry.title }}">{% endif %}
+      {% if entry.video %}<video controls src="{{ entry.video }}"></video>{% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  <!-- Team Section -->
+  <section id="team">
+    <h2>Meet Our Team</h2>
+    <div class="team-member">
+        <img src="adarsh.jpg" alt="Adarsh Singh" width="150" height="150">
+      <h3>Adarsh Singh</h3>
+      <p>Founder & Creative Director</p>
+      <p>MBA|BBA</p>
+    </div>
+    <div class="team-member">
+         <img src="ritik.jpg" alt="Ritik Yadav" width="150" height="150">
+      <h3>Ritik Yadav</h3>
+      <p>Senior Technical Support and Operations Manager</p>
+      <p>BCA</p>
+    </div>
+  </section>
+
+  <!-- Blog Section -->
+  <section id="blog">
+    <h2>Our Blog</h2>
+    {% for blog in blogs %}
+    <article>
+      <h3>{{ blog.title }}</h3>
+      <p>{{ blog.content }}</p>
+    </article>
+    {% endfor %}
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <ul>
+      <li><a href="https://wa.me/919999999999" target="_blank">WhatsApp</a></li>
+      <li><a href="https://instagram.com/advertix" target="_blank">Instagram</a></li>
+      <li><a href="https://twitter.com/advertix" target="_blank">Twitter</a></li>
+      <li><a href="https://facebook.com/advertix" target="_blank">Facebook</a></li>
+      <li><a href="https://youtube.com/@advertix" target="_blank">YouTube</a></li>
+      <li><a href="https://goo.gl/maps/example" target="_blank">View Location on Map</a></li>
+    </ul>
+  </section>
+
+  <!-- Join Us Section -->
+  <section id="join">
+    <h2>Join the Advertix Community</h2>
+    <p>We’re building a network of designers, marketers, and creators who want to innovate and grow. Be part of it!</p>
+    <a href="https://chat.whatsapp.com/invite/communitylink" class="joinus-float">Join Us</a>
+  </section>
+
+  <!-- WhatsApp Floating Button -->
+  <a href="https://wa.me/919999999999" class="floating-btn whatsapp-float">Chat on WhatsApp</a>
+</body>
+</html>
