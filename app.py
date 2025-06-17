@@ -8,33 +8,39 @@ app.secret_key = 'your_secret_key'
 
 DATABASE = 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# ✅ Ensure the database exists with required tables
-def init_db():
-    if not os.path.exists(DATABASE):
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS blog (
-                id INTEGER PRIMARY KEY,
-                title TEXT,
-                content TEXT
-            )
-        ''')
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS portfolio (
-                id INTEGER PRIMARY KEY,
-                title TEXT,
-                description TEXT,
-                image TEXT,
-                video TEXT
-            )
-        ''')
-        conn.commit()
-        conn.close()
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# ✅ Call it once when app starts
+# Ensure tables exist
+def init_db():
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS blog (
+            id INTEGER PRIMARY KEY,
+            title TEXT,
+            content TEXT
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS portfolio (
+            id INTEGER PRIMARY KEY,
+            title TEXT,
+            description TEXT,
+            image TEXT,
+            video TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
 init_db()
 
 @app.route('/')
@@ -58,6 +64,11 @@ def login():
             return "Invalid credentials"
     return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('admin', None)
+    return redirect('/login')
+
 @app.route('/dashboard')
 def dashboard():
     if not session.get('admin'):
@@ -69,17 +80,14 @@ def dashboard():
     conn.close()
     return render_template('dashboard.html', blogs=blogs, portfolios=portfolios)
 
-@app.route('/logout')
-def logout():
-    session.pop('admin', None)
-    return redirect('/login')
-
 @app.route('/add-blog', methods=['POST'])
 def add_blog():
     if not session.get('admin'):
         return redirect('/login')
-    title = request.form['title']
-    content = request.form['content']
+    title = request.form.get('title')
+    content = request.form.get('content')
+    if not title or not content:
+        return "Title and content required", 400
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("INSERT INTO blog (title, content) VALUES (?, ?)", (title, content))
@@ -92,19 +100,22 @@ def add_portfolio():
     if not session.get('admin'):
         return redirect('/login')
 
-    title = request.form['title']
-    description = request.form['description']
-    image_file = request.files['image']
-    video_file = request.files['video']
+    title = request.form.get('title')
+    description = request.form.get('description')
+    image_file = request.files.get('image')
+    video_file = request.files.get('video')
+
+    if not title or not description or not image_file or not video_file:
+        return "All fields are required", 400
+
+    if not (allowed_file(image_file.filename) and allowed_file(video_file.filename)):
+        return "Invalid file type", 400
 
     image_filename = secure_filename(image_file.filename)
     video_filename = secure_filename(video_file.filename)
 
-    image_path = os.path.join(UPLOAD_FOLDER, image_filename)
-    video_path = os.path.join(UPLOAD_FOLDER, video_filename)
-
-    image_file.save(image_path)
-    video_file.save(video_path)
+    image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+    video_file.save(os.path.join(app.config['UPLOAD_FOLDER'], video_filename))
 
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -140,13 +151,15 @@ def delete_portfolio(id):
 def edit_blog(id):
     if not session.get('admin'):
         return redirect('/login')
-    
+
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    
+
     if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
+        title = request.form.get('title')
+        content = request.form.get('content')
+        if not title or not content:
+            return "Title and content required", 400
         c.execute("UPDATE blog SET title = ?, content = ? WHERE id = ?", (title, content, id))
         conn.commit()
         conn.close()
@@ -154,6 +167,8 @@ def edit_blog(id):
 
     blog = c.execute("SELECT * FROM blog WHERE id = ?", (id,)).fetchone()
     conn.close()
+    if not blog:
+        return "Blog not found", 404
     return render_template('edit_blog.html', blog=blog)
 
 @app.route('/edit-portfolio/<int:id>', methods=['GET', 'POST'])
@@ -165,22 +180,22 @@ def edit_portfolio(id):
     c = conn.cursor()
 
     if request.method == 'POST':
-        title = request.form['title']
-        description = request.form['description']
+        title = request.form.get('title')
+        description = request.form.get('description')
+        image_file = request.files.get('image')
+        video_file = request.files.get('video')
 
-        image_file = request.files['image']
-        video_file = request.files['video']
+        if not title or not description:
+            return "Title and description required", 400
 
-        if image_file.filename:
+        if image_file and image_file.filename and allowed_file(image_file.filename):
             image_filename = secure_filename(image_file.filename)
-            image_path = os.path.join(UPLOAD_FOLDER, image_filename)
-            image_file.save(image_path)
+            image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
             c.execute("UPDATE portfolio SET image = ? WHERE id = ?", (image_filename, id))
 
-        if video_file.filename:
+        if video_file and video_file.filename and allowed_file(video_file.filename):
             video_filename = secure_filename(video_file.filename)
-            video_path = os.path.join(UPLOAD_FOLDER, video_filename)
-            video_file.save(video_path)
+            video_file.save(os.path.join(app.config['UPLOAD_FOLDER'], video_filename))
             c.execute("UPDATE portfolio SET video = ? WHERE id = ?", (video_filename, id))
 
         c.execute("UPDATE portfolio SET title = ?, description = ? WHERE id = ?", (title, description, id))
@@ -190,6 +205,8 @@ def edit_portfolio(id):
 
     portfolio = c.execute("SELECT * FROM portfolio WHERE id = ?", (id,)).fetchone()
     conn.close()
+    if not portfolio:
+        return "Portfolio not found", 404
     return render_template('edit_portfolio.html', portfolio=portfolio)
 
 if __name__ == '__main__':
