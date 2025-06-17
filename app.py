@@ -3,7 +3,7 @@ import sqlite3
 import os
 from werkzeug.utils import secure_filename
 
-app = Flask(_name_, static_folder='static', template_folder='templates')
+app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = 'your_secret_key'
 
 DATABASE = 'database.db'
@@ -169,5 +169,5 @@ def delete_portfolio(id):
     conn.close()
     return redirect('/dashboard')
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     app.run(debug=True)
