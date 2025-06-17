@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Advertix | Your Creative Marketing Solution</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   <style>
-    #home.hero{
-      background-image: url('background.jpg');
+    #home.hero {
+      background-image: url('{{ url_for('static', filename='background.jpg') }}');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -21,7 +21,7 @@
   <!-- Header -->
   <header>
     <div class="logo">
-      <img src="logo.jpg" alt="Advertix Logo" />
+      <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Advertix Logo" />
       <h1>Advertix</h1>
     </div>
     <nav>
@@ -104,8 +104,8 @@
     <div class="portfolio-entry">
       <h3>{{ entry.title }}</h3>
       <p>{{ entry.description }}</p>
-      {% if entry.image %}<img src="{{ entry.image }}" alt="{{ entry.title }}">{% endif %}
-      {% if entry.video %}<video controls src="{{ entry.video }}"></video>{% endif %}
+      {% if entry.image %}<img src="{{ url_for('static', filename=entry.image) }}" alt="{{ entry.title }}">{% endif %}
+      {% if entry.video %}<video controls src="{{ url_for('static', filename=entry.video) }}"></video>{% endif %}
     </div>
     {% endfor %}
   </section>
@@ -114,13 +114,13 @@
   <section id="team">
     <h2>Meet Our Team</h2>
     <div class="team-member">
-        <img src="adarsh.jpg" alt="Adarsh Singh" width="150" height="150">
+      <img src="{{ url_for('static', filename='adarsh.jpg') }}" alt="Adarsh Singh" width="150" height="150">
       <h3>Adarsh Singh</h3>
       <p>Founder & Creative Director</p>
       <p>MBA|BBA</p>
     </div>
     <div class="team-member">
-         <img src="ritik.jpg" alt="Ritik Yadav" width="150" height="150">
+      <img src="{{ url_for('static', filename='ritik.jpg') }}" alt="Ritik Yadav" width="150" height="150">
       <h3>Ritik Yadav</h3>
       <p>Senior Technical Support and Operations Manager</p>
       <p>BCA</p>
