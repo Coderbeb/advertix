@@ -10,21 +10,21 @@ DATABASE = 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Create database and tables if not exist
+# ✅ Ensure the database exists with required tables
 def init_db():
     if not os.path.exists(DATABASE):
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute('''
             CREATE TABLE IF NOT EXISTS blog (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 title TEXT,
                 content TEXT
             )
         ''')
         c.execute('''
             CREATE TABLE IF NOT EXISTS portfolio (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 title TEXT,
                 description TEXT,
                 image TEXT,
@@ -34,7 +34,7 @@ def init_db():
         conn.commit()
         conn.close()
 
-# Initialize database at startup
+# ✅ Call it once when app starts
 init_db()
 
 @app.route('/')
@@ -91,6 +91,7 @@ def add_blog():
 def add_portfolio():
     if not session.get('admin'):
         return redirect('/login')
+
     title = request.form['title']
     description = request.form['description']
     image_file = request.files['image']
@@ -139,8 +140,10 @@ def delete_portfolio(id):
 def edit_blog(id):
     if not session.get('admin'):
         return redirect('/login')
+    
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
+    
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
@@ -148,6 +151,7 @@ def edit_blog(id):
         conn.commit()
         conn.close()
         return redirect('/dashboard')
+
     blog = c.execute("SELECT * FROM blog WHERE id = ?", (id,)).fetchone()
     conn.close()
     return render_template('edit_blog.html', blog=blog)
@@ -156,11 +160,14 @@ def edit_blog(id):
 def edit_portfolio(id):
     if not session.get('admin'):
         return redirect('/login')
+
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
+
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
+
         image_file = request.files['image']
         video_file = request.files['video']
 
