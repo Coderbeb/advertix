@@ -282,34 +282,6 @@ nav ul li a:hover {
   text-decoration: none;
   font-weight: bold;
 }
-
-/* Responsive */
-@media (max-width: 768px) {
-  .services {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  nav ul {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .floating-btn,
-  .whatsapp-float {
-    font-size: 14px;
-    padding: 10px 14px;
-  }
-}
-/* --- Responsive Hamburger Menu --- */
-.hamburger {
-  display: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: #ff3c3c;
-  margin-left: auto;
-}
-
 /* --- Hamburger menu icon --- */
 .hamburger {
   display: none;
@@ -319,7 +291,7 @@ nav ul li a:hover {
   margin-left: auto;
 }
 
-/* --- Responsive navigation --- */
+/* --- Responsive Nav for Mobile --- */
 @media (max-width: 768px) {
   nav ul {
     display: none;
@@ -347,16 +319,23 @@ nav ul li a:hover {
     justify-content: space-between;
   }
 
-  /* Style for "Join Us" inside menu */
   nav ul li .floating-btn {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 10px 16px;
     border-radius: 20px;
     background-color: #ff3c3c;
     color: white;
     text-decoration: none;
     font-weight: bold;
+    text-align: center;
     margin-top: 10px;
   }
+
+  /* Prevent default float on mobile */
+  .floating-btn {
+    float: none !important;
+  }
 }
+
+
 

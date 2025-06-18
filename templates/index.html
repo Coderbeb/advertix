@@ -21,6 +21,19 @@
       font-size: 28px;
       cursor: pointer;
       color: #ff3c3c;
+      margin-left: auto;
+    }
+
+    nav ul li .floating-btn {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 20px;
+      background-color: #ff3c3c;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
     }
 
     @media (max-width: 768px) {
@@ -51,7 +64,7 @@
       }
 
       .floating-btn {
-        margin-top: 10px;
+        float: none !important;
       }
     }
   </style>
@@ -75,10 +88,9 @@
         <li><a href="#team">Team</a></li>
         <li><a href="#blog">Blog</a></li>
         <li><a href="#contact">Contact</a></li>
+        <li><a href="#join" class="floating-btn">Join Us</a></li>
       </ul>
     </nav>
-
-    <a href="#join" class="floating-btn">Join Us</a>
   </header>
 
   <!-- Hero Section -->
@@ -209,7 +221,7 @@
   <!-- WhatsApp Floating Button -->
   <a href="https://wa.me/919999999999" class="floating-btn whatsapp-float">Chat on WhatsApp</a>
 
-  <!-- Mobile Nav Script -->
+  <!-- Toggle Script -->
   <script>
     function toggleMenu() {
       document.getElementById('nav-links').classList.toggle('open');
