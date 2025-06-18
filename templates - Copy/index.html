@@ -18,6 +18,7 @@
   </style>
 </head>
 <body>
+
   <!-- Header -->
   <header>
     <div class="logo">
@@ -46,8 +47,7 @@
   <!-- About Us Section -->
   <section class="about" id="about">
     <h2>About Us</h2>
-    <p>At Advertix, we specialize in designing unique, impactful marketing campaigns that connect directly with your customers. From creative offline promotions - like branded water bottles, cups, and packaging - to powerful online strategies - social media, SEO, and more - we help businesses grow visibility, loyalty, and sales.</p>
-    <p>We blend creativity, practicality, and cost-efficiency to make sure you get maximum reach without exceeding your budget.</p>
+    <p>We specialize in unique, impactful marketing campaigns that connect directly with your audience through online and offline strategies.</p>
   </section>
 
   <!-- Services Section -->
@@ -55,42 +55,38 @@
     <h2>🔷 OUR SERVICES 🔷</h2>
     <div class="services">
       <div class="service-category">
-        <h3>1️⃣ Offline Marketing Solutions</h3>
-        <p>We bring your brand directly into the hands of your customers through customized products like cups, bottles, packaging, and promotional materials. Our team crafts high-impact physical branding that leaves a lasting impression.</p>
+        <h3>1️⃣ Offline Marketing</h3>
+        <p>Reach customers with physical branding like cups, bottles, and packages.</p>
         <ul>
           <li>Labeling</li>
-          <li>Brand Promotion</li>
           <li>Packaging</li>
-          <li>Physical Advertising Materials</li>
+          <li>Product Branding</li>
         </ul>
       </div>
       <div class="service-category">
-        <h3>2️⃣ Online Marketing Services</h3>
-        <p>From social media campaigns and SEO strategies to content marketing and Google Ads, we help you build a strong online presence and engage effectively with your target audience across digital platforms.</p>
+        <h3>2️⃣ Online Marketing</h3>
+        <p>SEO, Google Ads, and social media strategies tailored to your brand.</p>
         <ul>
-          <li>Social Media Campaigns</li>
           <li>SEO</li>
+          <li>Social Media Campaigns</li>
           <li>Content Marketing</li>
-          <li>Google Ads</li>
         </ul>
       </div>
       <div class="service-category">
-        <h3>3️⃣ Branding & Visual Identity</h3>
-        <p>Your logo, color scheme, and brand style reflect your business’s essence. We work with you to create a powerful brand identity that makes you stand out in a competitive marketplace.</p>
+        <h3>3️⃣ Branding & Identity</h3>
+        <p>We help craft a unique identity that sets your brand apart.</p>
         <ul>
           <li>Logo Design</li>
-          <li>Color Palettes</li>
+          <li>Visual Guidelines</li>
           <li>Typography</li>
-          <li>Brand Guidelines</li>
         </ul>
       </div>
       <div class="service-category">
         <h3>4️⃣ Creative Strategy</h3>
-        <p>We combine data, creativity, and consumer psychology to design compelling campaigns that capture attention, spark engagement, and drive real results.</p>
+        <p>Research-backed strategies that drive real business outcomes.</p>
         <ul>
-          <li>Consumer Research</li>
-          <li>Ad Strategy</li>
-          <li>Concept Development</li>
+          <li>Ad Concepts</li>
+          <li>Market Research</li>
           <li>Campaign Execution</li>
         </ul>
       </div>
@@ -101,12 +97,16 @@
   <section id="portfolio">
     <h2>Our Portfolio</h2>
     {% for entry in portfolio_entries %}
-    <div class="portfolio-entry">
-      <h3>{{ entry.title }}</h3>
-      <p>{{ entry.description }}</p>
-      {% if entry.image %}<img src="{{ url_for('static', filename=entry.image) }}" alt="{{ entry.title }}">{% endif %}
-      {% if entry.video %}<video controls src="{{ url_for('static', filename=entry.video) }}"></video>{% endif %}
-    </div>
+      <div class="portfolio-entry">
+        <h3>{{ entry[0] }}</h3>
+        <p>{{ entry[1] }}</p>
+        {% if entry[2] %}
+          <img src="{{ url_for('static', filename='uploads/' ~ entry[2]) }}" alt="{{ entry[0] }}">
+        {% endif %}
+        {% if entry[3] %}
+          <video controls src="{{ url_for('static', filename='uploads/' ~ entry[3]) }}"></video>
+        {% endif %}
+      </div>
     {% endfor %}
   </section>
 
@@ -114,16 +114,14 @@
   <section id="team">
     <h2>Meet Our Team</h2>
     <div class="team-member">
-      <img src="{{ url_for('static', filename='adarsh.jpg') }}" alt="Adarsh Singh" width="150" height="150">
+      <img src="{{ url_for('static', filename='adarsh.jpg') }}" alt="Adarsh Singh" width="150" height="150" />
       <h3>Adarsh Singh</h3>
       <p>Founder & Creative Director</p>
-      <p>MBA|BBA</p>
     </div>
     <div class="team-member">
-      <img src="{{ url_for('static', filename='ritik.jpg') }}" alt="Ritik Yadav" width="150" height="150">
+      <img src="{{ url_for('static', filename='ritik.jpg') }}" alt="Ritik Yadav" width="150" height="150" />
       <h3>Ritik Yadav</h3>
-      <p>Senior Technical Support and Operations Manager</p>
-      <p>BCA</p>
+      <p>Operations & Technical Manager</p>
     </div>
   </section>
 
@@ -131,10 +129,10 @@
   <section id="blog">
     <h2>Our Blog</h2>
     {% for blog in blogs %}
-    <article>
-      <h3>{{ blog.title }}</h3>
-      <p>{{ blog.content }}</p>
-    </article>
+      <article>
+        <h3>{{ blog[0] }}</h3>
+        <p>{{ blog[1] }}</p>
+      </article>
     {% endfor %}
   </section>
 
@@ -147,18 +145,18 @@
       <li><a href="https://twitter.com/advertix" target="_blank">Twitter</a></li>
       <li><a href="https://facebook.com/advertix" target="_blank">Facebook</a></li>
       <li><a href="https://youtube.com/@advertix" target="_blank">YouTube</a></li>
-      <li><a href="https://goo.gl/maps/example" target="_blank">View Location on Map</a></li>
     </ul>
   </section>
 
   <!-- Join Us Section -->
   <section id="join">
     <h2>Join the Advertix Community</h2>
-    <p>We’re building a network of designers, marketers, and creators who want to innovate and grow. Be part of it!</p>
+    <p>We're building a network of creators, marketers, and innovators. Be a part of it!</p>
     <a href="https://chat.whatsapp.com/invite/communitylink" class="joinus-float">Join Us</a>
   </section>
 
-  <!-- WhatsApp Floating Button -->
+  <!-- Floating WhatsApp Button -->
   <a href="https://wa.me/919999999999" class="floating-btn whatsapp-float">Chat on WhatsApp</a>
+
 </body>
 </html>
