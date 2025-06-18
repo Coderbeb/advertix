@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - Advertix</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: white;
+      padding: 30px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    form {
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: none;
+      border-radius: 6px;
+      background-color: #333;
+      color: white;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .entry {
+      background-color: #1e1e1e;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .entry-actions {
+      margin-top: 10px;
+    }
+
+    .entry-actions a {
+      color: #00aaff;
+      margin-right: 20px;
+      text-decoration: none;
+    }
+
+    hr {
+      margin: 40px auto;
+      max-width: 500px;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Admin Dashboard</h2>
+
+  <!-- Portfolio Upload Form -->
+  <form action="/add-portfolio" method="POST" enctype="multipart/form-data">
+    <h3>Add Portfolio Entry</h3>
+    <label for="portfolio_title">Title</label>
+    <input type="text" id="portfolio_title" name="title" required>
+
+    <label for="portfolio_description">Description</label>
+    <textarea id="portfolio_description" name="description" rows="4" required></textarea>
+
+    <label for="portfolio_image">Image</label>
+    <input type="file" id="portfolio_image" name="image" accept="image/*" required>
+
+    <label for="portfolio_video">Video</label>
+    <input type="file" id="portfolio_video" name="video" accept="video/*" required>
+
+    <button type="submit">Upload Portfolio</button>
+  </form>
+
+  <hr>
+
+  <!-- Blog Upload Form -->
+  <form action="/add-blog" method="POST">
+    <h3>Add Blog Post</h3>
+    <label for="blog_title">Title</label>
+    <input type="text" id="blog_title" name="title" required>
+
+    <label for="blog_content">Content</label>
+    <textarea id="blog_content" name="content" rows="6" required></textarea>
+
+    <button type="submit">Upload Blog</button>
+  </form>
+
+  <hr>
+
+  <!-- View Portfolio Entries -->
+  <h3 style="text-align:center;">Your Portfolio Entries</h3>
+  {% for entry in portfolio_entries %}
+    <div class="entry">
+      <strong>Title:</strong> {{ entry[1] }}<br>
+      <strong>Description:</strong> {{ entry[2] }}<br>
+      <div class="entry-actions">
+        <a href="/edit-portfolio/{{ entry[0] }}">Edit</a>
+        <a href="/delete-portfolio/{{ entry[0] }}">Delete</a>
+      </div>
+    </div>
+  {% endfor %}
+
+  <hr>
+
+  <!-- View Blog Posts -->
+  <h3 style="text-align:center;">Your Blog Posts</h3>
+  {% for blog in blogs %}
+    <div class="entry">
+      <strong>Title:</strong> {{ blog[1] }}<br>
+      <strong>Content:</strong> {{ blog[2] }}<br>
+      <div class="entry-actions">
+        <a href="/edit-blog/{{ blog[0] }}">Edit</a>
+        <a href="/delete-blog/{{ blog[0] }}">Delete</a>
+      </div>
+    </div>
+  {% endfor %}
+
+</body>
+</html>
