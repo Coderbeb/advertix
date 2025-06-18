@@ -335,3 +335,80 @@ nav ul li .floating-btn:hover {
     margin-top: 10px;
   }
 }
+.hero-content {
+  text-align: center;
+  padding: 80px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-logo {
+  width: 250px;
+  max-width: 90%;
+  animation: zoomIn 1s ease forwards;
+  opacity: 0;
+}
+
+.hero-content h2 {
+  color: #ffffff;
+  font-size: 1.8rem;
+  margin-top: 20px;
+  animation: fadeInUp 1s ease-out forwards;
+  opacity: 0;
+}
+
+.hero-content p {
+  color: #cccccc;
+  margin-top: 10px;
+  font-size: 1.1rem;
+  animation: fadeInUp 1s ease-out forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+/* Animations */
+@keyframes zoomIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 1s ease-out forwards;
+}
+
+.fade-in.delay {
+  animation-delay: 0.4s;
+}
+
+.fade-in.delay2 {
+  animation-delay: 0.8s;
+}
+
+@media (max-width: 768px) {
+  .hero-logo {
+    width: 180px;
+  }
+  .hero-content h2 {
+    font-size: 1.4rem;
+  }
+  .hero-content p {
+    font-size: 1rem;
+  }
+}
