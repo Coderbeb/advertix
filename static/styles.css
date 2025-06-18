@@ -310,7 +310,16 @@ nav ul li a:hover {
   margin-left: auto;
 }
 
-/* Mobile Styles */
+/* --- Hamburger menu icon --- */
+.hamburger {
+  display: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #ff3c3c;
+  margin-left: auto;
+}
+
+/* --- Responsive navigation --- */
 @media (max-width: 768px) {
   nav ul {
     display: none;
@@ -336,10 +345,18 @@ nav ul li a:hover {
   header {
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 10px;
   }
 
-  .floating-btn {
+  /* Style for "Join Us" inside menu */
+  nav ul li .floating-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background-color: #ff3c3c;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
     margin-top: 10px;
   }
 }
+
