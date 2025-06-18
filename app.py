@@ -2,9 +2,11 @@ from flask import Flask, render_template, request, redirect, session, url_for
 import sqlite3
 import os
 from werkzeug.utils import secure_filename
+from functools import wraps
+import secrets
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = secrets.token_hex(32)
 
 DATABASE = 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
@@ -14,8 +16,10 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def init_db():
     conn = sqlite3.connect(DATABASE)
@@ -39,7 +43,18 @@ def init_db():
     conn.commit()
     conn.close()
 
+
 init_db()
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin'):
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route('/')
 def index():
@@ -49,6 +64,7 @@ def index():
     portfolio_entries = c.execute('SELECT title, description, image, video FROM portfolio').fetchall()
     conn.close()
     return render_template('index.html', blogs=blogs, portfolio_entries=portfolio_entries)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -62,15 +78,16 @@ def login():
             return "Invalid credentials"
     return render_template('login.html')
 
+
 @app.route('/logout')
 def logout():
     session.pop('admin', None)
     return redirect('/login')
 
+
 @app.route('/dashboard')
+@login_required
 def dashboard():
-    if not session.get('admin'):
-        return redirect('/login')
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     blogs = c.execute("SELECT * FROM blog").fetchall()
@@ -78,10 +95,10 @@ def dashboard():
     conn.close()
     return render_template('dashboard.html', blogs=blogs, portfolios=portfolios)
 
+
 @app.route('/add-blog', methods=['POST'])
+@login_required
 def add_blog():
-    if not session.get('admin'):
-        return redirect('/login')
     title = request.form.get('title')
     content = request.form.get('content')
     if not title or not content:
@@ -93,11 +110,10 @@ def add_blog():
     conn.close()
     return redirect('/dashboard')
 
-@app.route('/add-portfolio', methods=['POST'])
-def add_portfolio():
-    if not session.get('admin'):
-        return redirect('/login')
 
+@app.route('/add-portfolio', methods=['POST'])
+@login_required
+def add_portfolio():
     title = request.form.get('title')
     description = request.form.get('description')
     image_file = request.files.get('image')
@@ -123,10 +139,10 @@ def add_portfolio():
     conn.close()
     return redirect('/dashboard')
 
+
 @app.route('/delete-blog/<int:id>')
+@login_required
 def delete_blog(id):
-    if not session.get('admin'):
-        return redirect('/login')
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("DELETE FROM blog WHERE id = ?", (id,))
@@ -134,10 +150,10 @@ def delete_blog(id):
     conn.close()
     return redirect('/dashboard')
 
+
 @app.route('/delete-portfolio/<int:id>')
+@login_required
 def delete_portfolio(id):
-    if not session.get('admin'):
-        return redirect('/login')
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("DELETE FROM portfolio WHERE id = ?", (id,))
@@ -145,11 +161,10 @@ def delete_portfolio(id):
     conn.close()
     return redirect('/dashboard')
 
-@app.route('/edit-blog/<int:id>', methods=['GET', 'POST'])
-def edit_blog(id):
-    if not session.get('admin'):
-        return redirect('/login')
 
+@app.route('/edit-blog/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_blog(id):
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
@@ -169,11 +184,10 @@ def edit_blog(id):
         return "Blog not found", 404
     return render_template('edit_blog.html', blog=blog)
 
-@app.route('/edit-portfolio/<int:id>', methods=['GET', 'POST'])
-def edit_portfolio(id):
-    if not session.get('admin'):
-        return redirect('/login')
 
+@app.route('/edit-portfolio/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_portfolio(id):
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
 
@@ -206,6 +220,7 @@ def edit_portfolio(id):
     if not portfolio:
         return "Portfolio not found", 404
     return render_template('edit_portfolio.html', portfolio=portfolio)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
