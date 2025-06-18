@@ -282,48 +282,33 @@ nav ul li a:hover {
   text-decoration: none;
   font-weight: bold;
 }
-/* Hide desktop/mobile-specific buttons */
-.desktop-only {
-  display: inline-block;
-}
-
-.mobile-only {
+.hamburger {
   display: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #ff3c3c;
+  margin-left: auto;
 }
 
-/* Header layout */
-header {
-  background-color: #1a1a1a;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+/* Make Join Us inside nav look like a button */
+nav ul li .floating-btn {
+  background-color: #ff3c3c;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-weight: bold;
+  text-decoration: none;
+  margin-left: 10px;
+  transition: background 0.3s ease;
 }
 
-.logo {
-  display: flex;
-  align-items: center;
+nav ul li .floating-btn:hover {
+  background-color: #e22b2b;
 }
 
-.logo img {
-  height: 40px;
-  margin-right: 10px;
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-  .desktop-only {
-    display: none;
-  }
-
-  .mobile-only {
-    display: block;
-  }
-
   nav ul {
+    display: none;
     flex-direction: column;
     background: #1a1a1a;
     position: absolute;
@@ -333,7 +318,6 @@ header {
     border-radius: 10px;
     box-shadow: 0 0 10px #000;
     z-index: 999;
-    display: none;
   }
 
   nav.open ul {
@@ -342,28 +326,12 @@ header {
 
   .hamburger {
     display: block;
-    font-size: 28px;
-    cursor: pointer;
-    color: #ff3c3c;
-  }
-
-  header {
-    flex-wrap: wrap;
   }
 
   nav ul li .floating-btn {
-    display: inline-block;
-    padding: 10px 16px;
-    border-radius: 20px;
-    background-color: #ff3c3c;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
+    width: 100%;
     text-align: center;
+    margin-left: 0;
     margin-top: 10px;
   }
 }
-
-
-
-
