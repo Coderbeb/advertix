@@ -301,3 +301,45 @@ nav ul li a:hover {
     padding: 10px 14px;
   }
 }
+/* --- Responsive Hamburger Menu --- */
+.hamburger {
+  display: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #ff3c3c;
+  margin-left: auto;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  nav ul {
+    display: none;
+    flex-direction: column;
+    background: #1a1a1a;
+    position: absolute;
+    top: 70px;
+    right: 10px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #000;
+    z-index: 999;
+  }
+
+  nav.open ul {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  header {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .floating-btn {
+    margin-top: 10px;
+  }
+}
