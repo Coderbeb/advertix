@@ -10,7 +10,6 @@ DATABASE = 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -18,7 +17,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Ensure tables exist
 def init_db():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()

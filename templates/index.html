@@ -102,10 +102,14 @@
     <h2>Our Portfolio</h2>
     {% for entry in portfolio_entries %}
     <div class="portfolio-entry">
-      <h3>{{ entry.title }}</h3>
-      <p>{{ entry.description }}</p>
-      {% if entry.image %}<img src="{{ url_for('static', filename=entry.image) }}" alt="{{ entry.title }}">{% endif %}
-      {% if entry.video %}<video controls src="{{ url_for('static', filename=entry.video) }}"></video>{% endif %}
+      <h3>{{ entry[0] }}</h3>
+      <p>{{ entry[1] }}</p>
+      {% if entry[2] %}
+        <img src="{{ url_for('static', filename='uploads/' ~ entry[2]) }}" alt="{{ entry[0] }}">
+      {% endif %}
+      {% if entry[3] %}
+        <video controls src="{{ url_for('static', filename='uploads/' ~ entry[3]) }}"></video>
+      {% endif %}
     </div>
     {% endfor %}
   </section>
@@ -117,7 +121,7 @@
       <img src="{{ url_for('static', filename='adarsh.jpg') }}" alt="Adarsh Singh" width="150" height="150">
       <h3>Adarsh Singh</h3>
       <p>Founder & Creative Director</p>
-      <p>MBA|BBA</p>
+      <p>MBA | BBA</p>
     </div>
     <div class="team-member">
       <img src="{{ url_for('static', filename='ritik.jpg') }}" alt="Ritik Yadav" width="150" height="150">
@@ -132,8 +136,8 @@
     <h2>Our Blog</h2>
     {% for blog in blogs %}
     <article>
-      <h3>{{ blog.title }}</h3>
-      <p>{{ blog.content }}</p>
+      <h3>{{ blog[0] }}</h3>
+      <p>{{ blog[1] }}</p>
     </article>
     {% endfor %}
   </section>
