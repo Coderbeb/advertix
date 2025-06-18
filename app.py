@@ -71,7 +71,7 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        if email == "admin@example.com" and password == "admin123":
+        if email == "coderbeb@gmail.com" and password == "coderbeb??80":
             session['admin'] = True
             return redirect('/dashboard')
         else:
