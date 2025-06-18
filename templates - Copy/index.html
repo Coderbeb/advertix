@@ -24,15 +24,12 @@
       margin-left: auto;
     }
 
-    nav ul li .floating-btn {
+    .desktop-only {
       display: inline-block;
-      padding: 8px 16px;
-      border-radius: 20px;
-      background-color: #ff3c3c;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      margin-top: 10px;
+    }
+
+    .mobile-only {
+      display: none;
     }
 
     @media (max-width: 768px) {
@@ -57,9 +54,24 @@
         display: block;
       }
 
-      header {
-        flex-wrap: wrap;
-        justify-content: space-between;
+      .desktop-only {
+        display: none;
+      }
+
+      .mobile-only {
+        display: block;
+      }
+
+      nav ul li .floating-btn {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 20px;
+        background-color: #ff3c3c;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 10px;
       }
     }
   </style>
@@ -83,9 +95,11 @@
         <li><a href="#team">Team</a></li>
         <li><a href="#blog">Blog</a></li>
         <li><a href="#contact">Contact</a></li>
-        <li><a href="#join" class="floating-btn">Join Us</a></li>
+        <li class="mobile-only"><a href="#join" class="floating-btn">Join Us</a></li>
       </ul>
     </nav>
+
+    <a href="#join" class="floating-btn desktop-only">Join Us</a>
   </header>
 
   <!-- Hero Section -->
@@ -107,7 +121,7 @@
     <div class="services">
       <div class="service-category">
         <h3>1️⃣ Offline Marketing Solutions</h3>
-        <p>We bring your brand directly into the hands of your customers through customized products like cups, bottles, packaging, and promotional materials. Our team crafts high-impact physical branding that leaves a lasting impression.</p>
+        <p>We bring your brand directly into the hands of your customers through customized products like cups, bottles, packaging, and promotional materials.</p>
         <ul>
           <li>Labeling</li>
           <li>Brand Promotion</li>
@@ -117,7 +131,7 @@
       </div>
       <div class="service-category">
         <h3>2️⃣ Online Marketing Services</h3>
-        <p>From social media campaigns and SEO strategies to content marketing and Google Ads, we help you build a strong online presence and engage effectively with your target audience across digital platforms.</p>
+        <p>From social media campaigns and SEO strategies to content marketing and Google Ads, we help you build a strong online presence.</p>
         <ul>
           <li>Social Media Campaigns</li>
           <li>SEO</li>
@@ -127,7 +141,7 @@
       </div>
       <div class="service-category">
         <h3>3️⃣ Branding & Visual Identity</h3>
-        <p>Your logo, color scheme, and brand style reflect your business’s essence. We work with you to create a powerful brand identity that makes you stand out in a competitive marketplace.</p>
+        <p>Your logo, color scheme, and brand style reflect your business’s essence.</p>
         <ul>
           <li>Logo Design</li>
           <li>Color Palettes</li>
@@ -137,7 +151,7 @@
       </div>
       <div class="service-category">
         <h3>4️⃣ Creative Strategy</h3>
-        <p>We combine data, creativity, and consumer psychology to design compelling campaigns that capture attention, spark engagement, and drive real results.</p>
+        <p>We combine data, creativity, and consumer psychology to design compelling campaigns.</p>
         <ul>
           <li>Consumer Research</li>
           <li>Ad Strategy</li>
@@ -216,7 +230,7 @@
   <!-- WhatsApp Floating Button -->
   <a href="https://wa.me/919999999999" class="floating-btn whatsapp-float">Chat on WhatsApp</a>
 
-  <!-- Toggle Menu Script -->
+  <!-- Toggle Script -->
   <script>
     function toggleMenu() {
       document.getElementById('nav-links').classList.toggle('open');

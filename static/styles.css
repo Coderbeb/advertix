@@ -282,19 +282,48 @@ nav ul li a:hover {
   text-decoration: none;
   font-weight: bold;
 }
-/* --- Hamburger menu icon --- */
-.hamburger {
-  display: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: #ff3c3c;
-  margin-left: auto;
+/* Hide desktop/mobile-specific buttons */
+.desktop-only {
+  display: inline-block;
 }
 
-/* --- Responsive Nav for Mobile --- */
+.mobile-only {
+  display: none;
+}
+
+/* Header layout */
+header {
+  background-color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 40px;
+  margin-right: 10px;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  nav ul {
+  .desktop-only {
     display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  nav ul {
     flex-direction: column;
     background: #1a1a1a;
     position: absolute;
@@ -304,6 +333,7 @@ nav ul li a:hover {
     border-radius: 10px;
     box-shadow: 0 0 10px #000;
     z-index: 999;
+    display: none;
   }
 
   nav.open ul {
@@ -312,11 +342,13 @@ nav ul li a:hover {
 
   .hamburger {
     display: block;
+    font-size: 28px;
+    cursor: pointer;
+    color: #ff3c3c;
   }
 
   header {
     flex-wrap: wrap;
-    justify-content: space-between;
   }
 
   nav ul li .floating-btn {
@@ -330,12 +362,8 @@ nav ul li a:hover {
     text-align: center;
     margin-top: 10px;
   }
-
-  /* Prevent default float on mobile */
-  .floating-btn {
-    float: none !important;
-  }
 }
+
 
 
 
