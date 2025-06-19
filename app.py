@@ -272,5 +272,31 @@ def edit_portfolio(id):
         return "Portfolio not found", 404
     return render_template('edit_portfolio.html', portfolio=portfolio, images=images, videos=videos)
 
+@app.route('/delete-portfolio-image/<int:portfolio_id>/<filename>')
+@login_required
+def delete_portfolio_image(portfolio_id, filename):
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute("DELETE FROM portfolio_images WHERE portfolio_id=? AND filename=?", (portfolio_id, filename))
+    conn.commit()
+    conn.close()
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    return redirect(url_for('edit_portfolio', id=portfolio_id))
+
+@app.route('/delete-portfolio-video/<int:portfolio_id>/<filename>')
+@login_required
+def delete_portfolio_video(portfolio_id, filename):
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute("DELETE FROM portfolio_videos WHERE portfolio_id=? AND filename=?", (portfolio_id, filename))
+    conn.commit()
+    conn.close()
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    return redirect(url_for('edit_portfolio', id=portfolio_id))
+
 if __name__ == '__main__':
     app.run(debug=True)

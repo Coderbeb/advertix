@@ -96,20 +96,20 @@
   <!-- Portfolio Section -->
   <section id="portfolio">
     <h2>Our Portfolio</h2>
-    <div class="portfolio-gallery">
+    <div class="portfolio-list">
       {% for entry in portfolio_entries %}
-      <div class="portfolio-card">
-        <div class="portfolio-title">{{ entry.title }}</div>
-        <div class="portfolio-desc">{{ entry.description }}</div>
-        <div class="portfolio-media">
-          {% for img in entry.images %}
-            <img src="{{ url_for('static', filename='uploads/' ~ img) }}" class="portfolio-thumb" alt="Portfolio Image" onclick="openModal(this.src)">
-          {% endfor %}
-          {% for vid in entry.videos %}
-            <video src="{{ url_for('static', filename='uploads/' ~ vid) }}" class="portfolio-thumb" controls onclick="openModal(this.src, true)"></video>
-          {% endfor %}
+        <div class="portfolio-entry">
+          <div class="portfolio-title">{{ entry.title }}</div>
+          <div class="portfolio-desc">{{ entry.description }}</div>
+          <div class="portfolio-media">
+            {% for img in entry.images %}
+              <img src="{{ url_for('static', filename='uploads/' ~ img) }}" class="portfolio-thumb" alt="Portfolio Image" onclick="openModal(this.src)">
+            {% endfor %}
+            {% for vid in entry.videos %}
+              <video src="{{ url_for('static', filename='uploads/' ~ vid) }}" class="portfolio-thumb" controls onclick="openModal(this.src, true)"></video>
+            {% endfor %}
+          </div>
         </div>
-      </div>
       {% endfor %}
     </div>
     <!-- Modal for enlarged view -->
@@ -194,3 +194,9 @@
     function closeModal() {
       document.getElementById('mediaModal').style.display = 'none';
       document.getElementById('modalImg').src = '';
+      document.getElementById('modalVid').src = '';
+    }
+  </script>
+
+</body>
+</html>

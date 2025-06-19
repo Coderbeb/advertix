@@ -8,58 +8,124 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #121212;
-      color: white;
+      color: #fff;
       padding: 30px;
     }
-
     h2 {
       text-align: center;
       margin-bottom: 30px;
-    }
-
-    form {
-      background-color: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.6);
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
+      color: #fff;
       font-weight: bold;
     }
-
+    .card {
+      background-color: #1e1e1e;
+      padding: 28px 24px 24px 24px;
+      border-radius: 18px;
+      max-width: 600px;
+      margin: 40px auto 32px auto;
+      box-shadow: 0 0 18px rgba(0,0,0,0.6);
+    }
+    label {
+      display: block;
+      margin-top: 18px;
+      font-weight: bold;
+      color: #fff;
+      font-size: 1rem;
+    }
     input[type="text"],
     input[type="file"],
     textarea {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-top: 6px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       background-color: #333;
-      color: white;
+      color: #fff;
+      font-size: 1rem;
+      margin-bottom: 4px;
     }
-
-    button {
-      margin-top: 20px;
-      padding: 12px;
+    button, .edit-btn, .delete-btn {
+      margin-top: 24px;
+      padding: 14px;
       background-color: #007bff;
       border: none;
-      border-radius: 6px;
-      color: white;
+      border-radius: 8px;
+      color: #fff;
       font-weight: bold;
       cursor: pointer;
       width: 100%;
+      font-size: 1.1rem;
+      text-align: center;
+      transition: background 0.2s;
+      display: block;
     }
-
-    button:hover {
+    button:hover, .edit-btn:hover {
       background-color: #0056b3;
     }
-
+    .delete-btn {
+      background-color: #222;
+      color: #007bff;
+      border: 1px solid #007bff;
+      margin-top: 10px;
+      width: auto;
+      display: inline-block;
+      padding: 8px 18px;
+      font-size: 1rem;
+    }
+    .delete-btn:hover {
+      background-color: #007bff;
+      color: #fff;
+    }
+    .portfolio-media {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .media-item {
+      position: relative;
+      display: inline-block;
+    }
+    .portfolio-thumb {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #181818;
+      margin-bottom: 2px;
+    }
+    .media-delete-btn {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: #222;
+      color: #007bff;
+      border: 1px solid #007bff;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      text-align: center;
+      line-height: 20px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      z-index: 2;
+      transition: background 0.2s, color 0.2s;
+      display: inline-block;
+    }
+    .media-delete-btn:hover {
+      background: #007bff;
+      color: #fff;
+    }
+    .section-label {
+      margin-top: 24px;
+      color: #ff3c3c;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
     a.back {
       display: block;
       text-align: center;
@@ -67,33 +133,62 @@
       color: #ccc;
       text-decoration: none;
     }
-
     a.back:hover {
       text-decoration: underline;
+    }
+    .portfolio-title {
+      font-weight: bold;
+      color: #ff3c3c;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
   <h2>Edit Portfolio Entry</h2>
+  <div class="card">
+    <div class="portfolio-title">{{ portfolio.title }}</div>
+    <form action="/edit-portfolio/{{ portfolio.id }}" method="POST" enctype="multipart/form-data">
+      <label for="title">Title</label>
+      <input type="text" id="title" name="title" value="{{ portfolio.title }}" required>
 
-  <form action="/edit-portfolio/{{ portfolio[0] }}" method="POST" enctype="multipart/form-data">
-    <label for="title">Title</label>
-    <input type="text" id="title" name="title" value="{{ portfolio[1] }}" required>
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="4" required>{{ portfolio.description }}</textarea>
 
-    <label for="description">Description</label>
-    <textarea id="description" name="description" rows="4" required>{{ portfolio[2] }}</textarea>
+      <div class="section-label">Current Images</div>
+      <div class="portfolio-media">
+        {% for img in images %}
+          <div class="media-item">
+            <img src="{{ url_for('static', filename='uploads/' ~ img) }}" class="portfolio-thumb" alt="Portfolio Image">
+            <a href="/delete-portfolio-image/{{ portfolio.id }}/{{ img }}" class="media-delete-btn" title="Delete Image" onclick="return confirm('Delete this image?');">&times;</a>
+          </div>
+        {% endfor %}
+        {% if images|length == 0 %}
+          <span style="color:#ccc;">No images uploaded.</span>
+        {% endif %}
+      </div>
 
-    <label for="image">New Image (leave blank to keep current)</label>
-    <input type="file" id="image" name="image" accept="image/*">
+      <label for="images">Add Images</label>
+      <input type="file" id="images" name="images" accept="image/*" multiple>
 
-    <label for="video">New Video (leave blank to keep current)</label>
-    <input type="file" id="video" name="video" accept="video/*">
+      <div class="section-label">Current Videos</div>
+      <div class="portfolio-media">
+        {% for vid in videos %}
+          <div class="media-item">
+            <video src="{{ url_for('static', filename='uploads/' ~ vid) }}" class="portfolio-thumb" controls></video>
+            <a href="/delete-portfolio-video/{{ portfolio.id }}/{{ vid }}" class="media-delete-btn" title="Delete Video" onclick="return confirm('Delete this video?');">&times;</a>
+          </div>
+        {% endfor %}
+        {% if videos|length == 0 %}
+          <span style="color:#ccc;">No videos uploaded.</span>
+        {% endif %}
+      </div>
 
-    <button type="submit">Update Portfolio</button>
-  </form>
+      <label for="videos">Add Videos</label>
+      <input type="file" id="videos" name="videos" accept="video/*" multiple>
 
-  <a class="back" href="/dashboard">← Back to Dashboard</a>
-
-</body>
-</html>
+      <button type="submit">Update Portfolio</button>
+    </form>
+    <a class="back" href="/dashboard">← Back to

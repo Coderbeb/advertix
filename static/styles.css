@@ -64,7 +64,7 @@ nav ul li a:hover {
 }
 
 #home.hero {
-  background-image: url('../background.jpg');
+  background-image: url('background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -154,53 +154,56 @@ nav ul li a:hover {
   margin-bottom: 30px;
 }
 
-/* Portfolio Gallery Styles */
-.portfolio-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: flex-start;
-}
-.portfolio-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  padding: 16px;
-  width: 280px;
-  margin-bottom: 20px;
+/* Portfolio List Layout (No Card/Box) */
+.portfolio-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 48px;
 }
+
+.portfolio-entry {
+  background: transparent;
+  padding: 0 0 32px 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin-bottom: 0;
+  border-bottom: 1px solid #222;
+}
+
 .portfolio-title {
-  font-size: 1.1em;
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 6px;
-  text-align: center;
   color: #ff3c3c;
-}
-.portfolio-desc {
-  font-size: 0.98em;
   margin-bottom: 10px;
-  text-align: center;
-  color: #222;
+  background: transparent;
+  text-align: left;
 }
+
+.portfolio-desc {
+  font-size: 1.1rem;
+  color: #ccc;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
 .portfolio-media {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
+  gap: 12px;
   margin-bottom: 8px;
 }
+
 .portfolio-thumb {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  border-radius: 8px;
+  border: 1px solid #444;
   cursor: pointer;
-  background: #f8f8f8;
+  background: #181818;
 }
+
+/* Modal styles */
 .modal {
   display: none;
   position: fixed;
@@ -223,6 +226,34 @@ nav ul li a:hover {
   font-size: 2em;
   cursor: pointer;
   z-index: 1100;
+}
+
+/* Dashboard Edit/Delete Buttons */
+.entry-actions {
+  margin-top: 10px;
+}
+
+.edit-btn, .delete-btn {
+  display: inline-block;
+  margin-right: 10px;
+  color: #fff;
+  background: #ff3c3c;
+  padding: 6px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+.delete-btn {
+  background: #222;
+  color: #ff3c3c;
+}
+.edit-btn:hover {
+  background: #e22b2b;
+}
+.delete-btn:hover {
+  background: #ff3c3c;
+  color: #fff;
 }
 
 /* Team */
@@ -402,14 +433,12 @@ nav ul li .floating-btn:hover {
     margin-left: 0;
     margin-top: 10px;
   }
-  .portfolio-gallery {
+  .portfolio-list {
     justify-content: center;
   }
-  .portfolio-card {
-    width: 95vw;
-    max-width: 340px;
-  }
 }
+
+/* Hero Content and Animations */
 .hero-content {
   text-align: center;
   padding: 80px 20px;
@@ -486,4 +515,3 @@ nav ul li .floating-btn:hover {
   .hero-content p {
     font-size: 1rem;
   }
-}
