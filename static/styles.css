@@ -63,6 +63,16 @@ nav ul li a:hover {
   justify-content: center;
 }
 
+#home.hero {
+  background-image: url('../background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #fff;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+}
+
 /* About Section */
 .about {
   background: #1f1f1f;
@@ -144,17 +154,75 @@ nav ul li a:hover {
   margin-bottom: 30px;
 }
 
-.portfolio-entry {
-  text-align: center;
-  color: #ccc;
-  margin-bottom: 30px;
+/* Portfolio Gallery Styles */
+.portfolio-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
 }
-
-.portfolio-entry img,
-.portfolio-entry video {
-  max-width: 100%;
+.portfolio-card {
+  background: #fff;
   border-radius: 10px;
-  margin-top: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 16px;
+  width: 280px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.portfolio-title {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-bottom: 6px;
+  text-align: center;
+  color: #ff3c3c;
+}
+.portfolio-desc {
+  font-size: 0.98em;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #222;
+}
+.portfolio-media {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.portfolio-thumb {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background: #f8f8f8;
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.7);
+  align-items: center; justify-content: center;
+}
+.modal-content {
+  max-width: 90vw; max-height: 90vh;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+}
+.modal-close {
+  color: #fff;
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  font-size: 2em;
+  cursor: pointer;
+  z-index: 1100;
 }
 
 /* Team */
@@ -333,6 +401,13 @@ nav ul li .floating-btn:hover {
     text-align: center;
     margin-left: 0;
     margin-top: 10px;
+  }
+  .portfolio-gallery {
+    justify-content: center;
+  }
+  .portfolio-card {
+    width: 95vw;
+    max-width: 340px;
   }
 }
 .hero-content {
