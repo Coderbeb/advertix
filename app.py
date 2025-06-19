@@ -211,6 +211,7 @@ def delete_portfolio(id):
 @login_required
 def edit_blog(id):
     conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     if request.method == 'POST':
@@ -233,6 +234,7 @@ def edit_blog(id):
 @login_required
 def edit_portfolio(id):
     conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     if request.method == 'POST':
@@ -265,8 +267,8 @@ def edit_portfolio(id):
         return redirect('/dashboard')
 
     portfolio = c.execute("SELECT * FROM portfolio WHERE id = ?", (id,)).fetchone()
-    images = [row[0] for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (id,))]
-    videos = [row[0] for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (id,))]
+    images = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (id,))]
+    videos = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (id,))]
     conn.close()
     if not portfolio:
         return "Portfolio not found", 404
