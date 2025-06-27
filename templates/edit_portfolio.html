@@ -161,7 +161,7 @@
       <div class="portfolio-media">
         {% for img in images %}
           <div class="media-item">
-            <img src="{{ url_for('static', filename='uploads/' ~ img) }}" class="portfolio-thumb" alt="Portfolio Image">
+            <img src="{{ img }}" class="portfolio-thumb" alt="Portfolio Image">
             <a href="/delete-portfolio-image/{{ portfolio.id }}/{{ img }}" class="media-delete-btn" title="Delete Image" onclick="return confirm('Delete this image?');">&times;</a>
           </div>
         {% endfor %}
@@ -177,7 +177,7 @@
       <div class="portfolio-media">
         {% for vid in videos %}
           <div class="media-item">
-            <video src="{{ url_for('static', filename='uploads/' ~ vid) }}" class="portfolio-thumb" controls></video>
+            <video src="{{ vid }}" class="portfolio-thumb" controls></video>
             <a href="/delete-portfolio-video/{{ portfolio.id }}/{{ vid }}" class="media-delete-btn" title="Delete Video" onclick="return confirm('Delete this video?');">&times;</a>
           </div>
         {% endfor %}

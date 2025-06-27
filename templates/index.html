@@ -103,15 +103,16 @@
           <div class="portfolio-desc">{{ entry.description }}</div>
           <div class="portfolio-media">
             {% for img in entry.images %}
-              <img src="{{ url_for('static', filename='uploads/' ~ img) }}" class="portfolio-thumb" alt="Portfolio Image" onclick="openModal(this.src)">
+              <img src="{{ img }}" class="portfolio-thumb" alt="Portfolio Image" onclick="openModal('{{ img }}')">
             {% endfor %}
             {% for vid in entry.videos %}
-              <video src="{{ url_for('static', filename='uploads/' ~ vid) }}" class="portfolio-thumb" controls onclick="openModal(this.src, true)"></video>
+              <video src="{{ vid }}" class="portfolio-thumb" controls onclick="openModal('{{ vid }}', true)"></video>
             {% endfor %}
           </div>
         </div>
       {% endfor %}
     </div>
+
     <!-- Modal for enlarged view -->
     <div id="mediaModal" class="modal" onclick="closeModal()">
       <span class="modal-close" onclick="closeModal()">&times;</span>
@@ -179,7 +180,7 @@
       document.getElementById('nav-links').classList.toggle('open');
     }
 
-    function openModal(src, isVideo=false) {
+    function openModal(src, isVideo = false) {
       document.getElementById('mediaModal').style.display = 'flex';
       if (isVideo) {
         document.getElementById('modalVid').src = src;
@@ -191,6 +192,7 @@
         document.getElementById('modalVid').style.display = 'none';
       }
     }
+
     function closeModal() {
       document.getElementById('mediaModal').style.display = 'none';
       document.getElementById('modalImg').src = '';

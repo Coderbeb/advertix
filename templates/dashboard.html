@@ -159,7 +159,6 @@
 
   <h2>Admin Dashboard</h2>
 
-  <!-- Portfolio Upload Form -->
   <div class="card">
     <h3 style="color:#fff; margin-top:0;">Add Portfolio Entry</h3>
     <form action="/add-portfolio" method="POST" enctype="multipart/form-data">
@@ -181,7 +180,6 @@
 
   <hr>
 
-  <!-- Blog Upload Form -->
   <div class="card">
     <h3 style="color:#fff; margin-top:0;">Add Blog Post</h3>
     <form action="/add-blog" method="POST">
@@ -197,7 +195,6 @@
 
   <hr>
 
-  <!-- View Portfolio Entries -->
   <h3>Your Portfolio Entries</h3>
   {% for entry in portfolios %}
     <div class="entry">
@@ -205,10 +202,10 @@
       <div class="portfolio-desc">{{ entry.description }}</div>
       <div class="portfolio-media">
         {% for img in entry.images %}
-          <img src="{{ url_for('static', filename='uploads/' ~ img) }}" class="portfolio-thumb" alt="Portfolio Image">
+          <img src="{{ img }}" class="portfolio-thumb" alt="Portfolio Image">
         {% endfor %}
         {% for vid in entry.videos %}
-          <video src="{{ url_for('static', filename='uploads/' ~ vid) }}" class="portfolio-thumb" controls></video>
+          <video src="{{ vid }}" class="portfolio-thumb" controls></video>
         {% endfor %}
       </div>
       <div class="entry-actions">
@@ -222,7 +219,6 @@
 
   <hr>
 
-  <!-- View Blog Posts -->
   <h3>Your Blog Posts</h3>
   {% for blog in blogs %}
     <div class="entry">
@@ -239,4 +235,8 @@
 
   <div class="dashboard-actions">
     <a href="/logout" class="edit-btn logout">Logout</a>
-    <a href="/" class="edit-btn website">Go to
+    <a href="/" class="edit-btn website">Go to Website</a>
+  </div>
+
+</body>
+</html>
