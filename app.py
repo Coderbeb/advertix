@@ -7,20 +7,20 @@ import secrets
 import mimetypes
 from drive_utils import upload_to_drive, download_database_from_drive, backup_database_to_drive
 
-
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
 
 DATABASE = 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Restore DB from drive (if exists)
-download_latest_backup(DATABASE)
+# Restore database from Google Drive if not present
+if not os.path.exists(DATABASE):
+    download_database_from_drive(DATABASE)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -28,36 +28,28 @@ def allowed_file(filename):
 def init_db():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS blog (
-            id INTEGER PRIMARY KEY,
-            title TEXT,
-            content TEXT
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS portfolio (
-            id INTEGER PRIMARY KEY,
-            title TEXT,
-            description TEXT
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS portfolio_images (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            portfolio_id INTEGER,
-            filename TEXT,
-            FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS portfolio_videos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            portfolio_id INTEGER,
-            filename TEXT,
-            FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
-        )
-    ''')
+    c.execute('''CREATE TABLE IF NOT EXISTS blog (
+        id INTEGER PRIMARY KEY,
+        title TEXT,
+        content TEXT
+    )''')
+    c.execute('''CREATE TABLE IF NOT EXISTS portfolio (
+        id INTEGER PRIMARY KEY,
+        title TEXT,
+        description TEXT
+    )''')
+    c.execute('''CREATE TABLE IF NOT EXISTS portfolio_images (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        portfolio_id INTEGER,
+        filename TEXT,
+        FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
+    )''')
+    c.execute('''CREATE TABLE IF NOT EXISTS portfolio_videos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        portfolio_id INTEGER,
+        filename TEXT,
+        FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
+    )''')
     conn.commit()
     conn.close()
 
@@ -143,7 +135,7 @@ def add_blog():
     c.execute("INSERT INTO blog (title, content) VALUES (?, ?)", (title, content))
     conn.commit()
     conn.close()
-    upload_db_to_drive(DATABASE)
+    backup_database_to_drive()
     return redirect('/dashboard')
 
 @app.route('/add-portfolio', methods=['POST'])
@@ -186,7 +178,7 @@ def add_portfolio():
 
     conn.commit()
     conn.close()
-    upload_db_to_drive(DATABASE)
+    backup_database_to_drive()
     return redirect('/dashboard')
 
 @app.route('/delete-blog/<int:id>')
@@ -197,7 +189,7 @@ def delete_blog(id):
     c.execute("DELETE FROM blog WHERE id = ?", (id,))
     conn.commit()
     conn.close()
-    upload_db_to_drive(DATABASE)
+    backup_database_to_drive()
     return redirect('/dashboard')
 
 @app.route('/delete-portfolio/<int:id>')
@@ -210,7 +202,7 @@ def delete_portfolio(id):
     c.execute("DELETE FROM portfolio WHERE id=?", (id,))
     conn.commit()
     conn.close()
-    upload_db_to_drive(DATABASE)
+    backup_database_to_drive()
     return redirect('/dashboard')
 
 @app.route('/edit-blog/<int:id>', methods=['GET', 'POST'])
@@ -228,7 +220,7 @@ def edit_blog(id):
         c.execute("UPDATE blog SET title = ?, content = ? WHERE id = ?", (title, content, id))
         conn.commit()
         conn.close()
-        upload_db_to_drive(DATABASE)
+        backup_database_to_drive()
         return redirect('/dashboard')
 
     blog = c.execute("SELECT * FROM blog WHERE id = ?", (id,)).fetchone()
@@ -279,7 +271,7 @@ def edit_portfolio(id):
 
         conn.commit()
         conn.close()
-        upload_db_to_drive(DATABASE)
+        backup_database_to_drive()
         return redirect('/dashboard')
 
     portfolio = c.execute("SELECT * FROM portfolio WHERE id = ?", (id,)).fetchone()
@@ -298,7 +290,7 @@ def delete_portfolio_image(portfolio_id, url):
     c.execute("DELETE FROM portfolio_images WHERE portfolio_id=? AND filename=?", (portfolio_id, url))
     conn.commit()
     conn.close()
-    upload_db_to_drive(DATABASE)
+    backup_database_to_drive()
     return redirect(url_for('edit_portfolio', id=portfolio_id))
 
 @app.route('/delete-portfolio-video/<int:portfolio_id>/<path:url>')
@@ -309,7 +301,7 @@ def delete_portfolio_video(portfolio_id, url):
     c.execute("DELETE FROM portfolio_videos WHERE portfolio_id=? AND filename=?", (portfolio_id, url))
     conn.commit()
     conn.close()
-    upload_db_to_drive(DATABASE)
+    backup_database_to_drive()
     return redirect(url_for('edit_portfolio', id=portfolio_id))
 
 if __name__ == '__main__':
