@@ -4,6 +4,8 @@ import os
 from werkzeug.utils import secure_filename
 from functools import wraps
 import secrets
+import mimetypes
+from drive_utils import upload_to_drive
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
@@ -11,7 +13,7 @@ app.secret_key = secrets.token_hex(32)
 DATABASE = 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -155,19 +157,25 @@ def add_portfolio():
     c.execute("INSERT INTO portfolio (title, description) VALUES (?, ?)", (title, description))
     portfolio_id = c.lastrowid
 
-    # Save images if any
     for image in images:
         if image and image.filename and allowed_file(image.filename):
             filename = secure_filename(image.filename)
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, filename))
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image.save(filepath)
+            mimetype, _ = mimetypes.guess_type(filepath)
+            drive_url = upload_to_drive(filepath, filename, mimetype)
+            os.remove(filepath)
+            c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, drive_url))
 
-    # Save videos if any
     for video in videos:
         if video and video.filename and allowed_file(video.filename):
             filename = secure_filename(video.filename)
-            video.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, filename))
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            video.save(filepath)
+            mimetype, _ = mimetypes.guess_type(filepath)
+            drive_url = upload_to_drive(filepath, filename, mimetype)
+            os.remove(filepath)
+            c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, drive_url))
 
     conn.commit()
     conn.close()
@@ -188,18 +196,6 @@ def delete_blog(id):
 def delete_portfolio(id):
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    # Delete images and videos files from disk
-    images = c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (id,)).fetchall()
-    for img in images:
-        img_path = os.path.join(app.config['UPLOAD_FOLDER'], img[0])
-        if os.path.exists(img_path):
-            os.remove(img_path)
-    videos = c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (id,)).fetchall()
-    for vid in videos:
-        vid_path = os.path.join(app.config['UPLOAD_FOLDER'], vid[0])
-        if os.path.exists(vid_path):
-            os.remove(vid_path)
-    # Delete from DB
     c.execute("DELETE FROM portfolio_images WHERE portfolio_id=?", (id,))
     c.execute("DELETE FROM portfolio_videos WHERE portfolio_id=?", (id,))
     c.execute("DELETE FROM portfolio WHERE id=?", (id,))
@@ -248,19 +244,25 @@ def edit_portfolio(id):
 
         c.execute("UPDATE portfolio SET title = ?, description = ? WHERE id = ?", (title, description, id))
 
-        # Optionally add new images
         for image in images:
             if image and image.filename and allowed_file(image.filename):
                 filename = secure_filename(image.filename)
-                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (id, filename))
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                image.save(filepath)
+                mimetype, _ = mimetypes.guess_type(filepath)
+                drive_url = upload_to_drive(filepath, filename, mimetype)
+                os.remove(filepath)
+                c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (id, drive_url))
 
-        # Optionally add new videos
         for video in videos:
             if video and video.filename and allowed_file(video.filename):
                 filename = secure_filename(video.filename)
-                video.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (id, filename))
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                video.save(filepath)
+                mimetype, _ = mimetypes.guess_type(filepath)
+                drive_url = upload_to_drive(filepath, filename, mimetype)
+                os.remove(filepath)
+                c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (id, drive_url))
 
         conn.commit()
         conn.close()
@@ -273,32 +275,6 @@ def edit_portfolio(id):
     if not portfolio:
         return "Portfolio not found", 404
     return render_template('edit_portfolio.html', portfolio=portfolio, images=images, videos=videos)
-
-@app.route('/delete-portfolio-image/<int:portfolio_id>/<filename>')
-@login_required
-def delete_portfolio_image(portfolio_id, filename):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute("DELETE FROM portfolio_images WHERE portfolio_id=? AND filename=?", (portfolio_id, filename))
-    conn.commit()
-    conn.close()
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    return redirect(url_for('edit_portfolio', id=portfolio_id))
-
-@app.route('/delete-portfolio-video/<int:portfolio_id>/<filename>')
-@login_required
-def delete_portfolio_video(portfolio_id, filename):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute("DELETE FROM portfolio_videos WHERE portfolio_id=? AND filename=?", (portfolio_id, filename))
-    conn.commit()
-    conn.close()
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    return redirect(url_for('edit_portfolio', id=portfolio_id))
 
 if __name__ == '__main__':
     app.run(debug=True)
