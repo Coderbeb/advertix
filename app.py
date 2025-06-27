@@ -18,7 +18,6 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Restore database from Google Drive if not present
 if not os.path.exists(DATABASE):
     download_database_from_drive(DATABASE)
 

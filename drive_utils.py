@@ -40,6 +40,7 @@ def upload_to_drive(filepath, filename, mimetype=None, folder_id=None):
 
         file_id = uploaded_file.get('id')
 
+        # Make file public
         service.permissions().create(
             fileId=file_id,
             body={'type': 'anyone', 'role': 'reader'},

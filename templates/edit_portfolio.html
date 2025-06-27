@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Edit Portfolio - Advertix</title>
   <style>
     body {
@@ -45,7 +45,7 @@
       font-size: 1rem;
       margin-bottom: 4px;
     }
-    button, .edit-btn, .delete-btn {
+    button {
       margin-top: 24px;
       padding: 14px;
       background-color: #007bff;
@@ -58,24 +58,9 @@
       font-size: 1.1rem;
       text-align: center;
       transition: background 0.2s;
-      display: block;
     }
-    button:hover, .edit-btn:hover {
+    button:hover {
       background-color: #0056b3;
-    }
-    .delete-btn {
-      background-color: #222;
-      color: #007bff;
-      border: 1px solid #007bff;
-      margin-top: 10px;
-      width: auto;
-      display: inline-block;
-      padding: 8px 18px;
-      font-size: 1rem;
-    }
-    .delete-btn:hover {
-      background-color: #007bff;
-      color: #fff;
     }
     .portfolio-media {
       display: flex;
@@ -85,7 +70,6 @@
     }
     .media-item {
       position: relative;
-      display: inline-block;
     }
     .portfolio-thumb {
       width: 90px;
@@ -94,7 +78,6 @@
       border-radius: 8px;
       border: 1px solid #444;
       background: #181818;
-      margin-bottom: 2px;
     }
     .media-delete-btn {
       position: absolute;
@@ -113,8 +96,6 @@
       cursor: pointer;
       text-decoration: none;
       z-index: 2;
-      transition: background 0.2s, color 0.2s;
-      display: inline-block;
     }
     .media-delete-btn:hover {
       background: #007bff;
@@ -146,7 +127,6 @@
   </style>
 </head>
 <body>
-
   <h2>Edit Portfolio Entry</h2>
   <div class="card">
     <div class="portfolio-title">{{ portfolio.title }}</div>

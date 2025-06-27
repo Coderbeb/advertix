@@ -159,6 +159,7 @@
 
   <h2>Admin Dashboard</h2>
 
+  <!-- Portfolio Upload Form -->
   <div class="card">
     <h3 style="color:#fff; margin-top:0;">Add Portfolio Entry</h3>
     <form action="/add-portfolio" method="POST" enctype="multipart/form-data">
@@ -180,6 +181,7 @@
 
   <hr>
 
+  <!-- Blog Upload Form -->
   <div class="card">
     <h3 style="color:#fff; margin-top:0;">Add Blog Post</h3>
     <form action="/add-blog" method="POST">
@@ -195,6 +197,7 @@
 
   <hr>
 
+  <!-- Portfolio Entries -->
   <h3>Your Portfolio Entries</h3>
   {% for entry in portfolios %}
     <div class="entry">
@@ -219,6 +222,7 @@
 
   <hr>
 
+  <!-- Blog Posts -->
   <h3>Your Blog Posts</h3>
   {% for blog in blogs %}
     <div class="entry">
