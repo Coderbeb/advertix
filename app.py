@@ -13,7 +13,7 @@ app.secret_key = secrets.token_hex(32)
 DATABASE = 'database.db'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -74,11 +74,11 @@ def index():
     c = conn.cursor()
     blogs = c.execute('SELECT title, content FROM blog').fetchall()
     portfolios = c.execute('SELECT * FROM portfolio').fetchall()
-    portfolio_entries = []
+    entries = []
     for p in portfolios:
         images = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
         videos = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
-        portfolio_entries.append({
+        entries.append({
             'id': p['id'],
             'title': p['title'],
             'description': p['description'],
@@ -86,7 +86,7 @@ def index():
             'videos': videos
         })
     conn.close()
-    return render_template('index.html', blogs=blogs, portfolio_entries=portfolio_entries)
+    return render_template('index.html', blogs=blogs, portfolio_entries=entries)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -113,11 +113,11 @@ def dashboard():
     c = conn.cursor()
     blogs = c.execute("SELECT * FROM blog").fetchall()
     portfolios = c.execute("SELECT * FROM portfolio").fetchall()
-    portfolio_list = []
+    entries = []
     for p in portfolios:
         images = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
         videos = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
-        portfolio_list.append({
+        entries.append({
             'id': p['id'],
             'title': p['title'],
             'description': p['description'],
@@ -125,7 +125,7 @@ def dashboard():
             'videos': videos
         })
     conn.close()
-    return render_template('dashboard.html', blogs=blogs, portfolios=portfolio_list)
+    return render_template('dashboard.html', blogs=blogs, portfolios=entries)
 
 @app.route('/add-blog', methods=['POST'])
 @login_required
@@ -157,25 +157,27 @@ def add_portfolio():
     c.execute("INSERT INTO portfolio (title, description) VALUES (?, ?)", (title, description))
     portfolio_id = c.lastrowid
 
-    for image in images:
-        if image and image.filename and allowed_file(image.filename):
-            filename = secure_filename(image.filename)
+    for media in images:
+        if media and media.filename and allowed_file(media.filename):
+            filename = secure_filename(media.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            image.save(filepath)
+            media.save(filepath)
             mimetype, _ = mimetypes.guess_type(filepath)
-            drive_url = upload_to_drive(filepath, filename, mimetype)
+            url = upload_to_drive(filepath, filename, mimetype)
             os.remove(filepath)
-            c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, drive_url))
+            if url:
+                c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, url))
 
-    for video in videos:
-        if video and video.filename and allowed_file(video.filename):
-            filename = secure_filename(video.filename)
+    for media in videos:
+        if media and media.filename and allowed_file(media.filename):
+            filename = secure_filename(media.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            video.save(filepath)
+            media.save(filepath)
             mimetype, _ = mimetypes.guess_type(filepath)
-            drive_url = upload_to_drive(filepath, filename, mimetype)
+            url = upload_to_drive(filepath, filename, mimetype)
             os.remove(filepath)
-            c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, drive_url))
+            if url:
+                c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, url))
 
     conn.commit()
     conn.close()
@@ -244,25 +246,27 @@ def edit_portfolio(id):
 
         c.execute("UPDATE portfolio SET title = ?, description = ? WHERE id = ?", (title, description, id))
 
-        for image in images:
-            if image and image.filename and allowed_file(image.filename):
-                filename = secure_filename(image.filename)
+        for media in images:
+            if media and media.filename and allowed_file(media.filename):
+                filename = secure_filename(media.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                image.save(filepath)
+                media.save(filepath)
                 mimetype, _ = mimetypes.guess_type(filepath)
-                drive_url = upload_to_drive(filepath, filename, mimetype)
+                url = upload_to_drive(filepath, filename, mimetype)
                 os.remove(filepath)
-                c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (id, drive_url))
+                if url:
+                    c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (id, url))
 
-        for video in videos:
-            if video and video.filename and allowed_file(video.filename):
-                filename = secure_filename(video.filename)
+        for media in videos:
+            if media and media.filename and allowed_file(media.filename):
+                filename = secure_filename(media.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                video.save(filepath)
+                media.save(filepath)
                 mimetype, _ = mimetypes.guess_type(filepath)
-                drive_url = upload_to_drive(filepath, filename, mimetype)
+                url = upload_to_drive(filepath, filename, mimetype)
                 os.remove(filepath)
-                c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (id, drive_url))
+                if url:
+                    c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (id, url))
 
         conn.commit()
         conn.close()

@@ -4,33 +4,36 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 
-# Scope for file-level access only
+# Google Drive API scope – file-level access
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
-# Path to service account JSON (place it safely in your project root)
-SERVICE_ACCOUNT_FILE = 'credentials.json'
+# Path to your Google Service Account JSON file
+SERVICE_ACCOUNT_FILE = 'credentials.json'  # should be in project root or mounted on Render
 
-# Authenticate and return the Google Drive service client
+# Initialize Google Drive API service
 def get_drive_service():
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES
-    )
-    return build('drive', 'v3', credentials=credentials)
+    try:
+        credentials = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE, scopes=SCOPES
+        )
+        return build('drive', 'v3', credentials=credentials)
+    except Exception as e:
+        print(f"[Drive Auth Error] Could not initialize Drive service: {e}")
+        return None
 
-# Uploads a file to Google Drive and returns a public direct link
+# Upload a file to Google Drive and return its public link
 def upload_to_drive(filepath, filename, mimetype=None, folder_id=None):
     try:
         service = get_drive_service()
+        if not service:
+            return None
 
-        # Set metadata (filename + optional folder)
         file_metadata = {'name': filename}
         if folder_id:
             file_metadata['parents'] = [folder_id]
 
-        # Prepare file for upload
         media = MediaIoBaseUpload(io.FileIO(filepath, 'rb'), mimetype=mimetype)
 
-        # Upload the file
         uploaded_file = service.files().create(
             body=file_metadata,
             media_body=media,
@@ -39,15 +42,15 @@ def upload_to_drive(filepath, filename, mimetype=None, folder_id=None):
 
         file_id = uploaded_file.get('id')
 
-        # Make file publicly accessible
+        # Make the file public
         service.permissions().create(
             fileId=file_id,
             body={'type': 'anyone', 'role': 'reader'},
         ).execute()
 
-        # Return public download URL
+        # Return a direct link
         return f"https://drive.google.com/uc?id={file_id}"
 
     except Exception as e:
-        print(f"Error uploading to Google Drive: {e}")
+        print(f"[Drive Upload Error] {e}")
         return None
