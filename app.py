@@ -5,7 +5,8 @@ from werkzeug.utils import secure_filename
 from functools import wraps
 import secrets
 import mimetypes
-from drive_utils import upload_to_drive, download_latest_backup, upload_db_to_drive
+from drive_utils import upload_to_drive, download_database_from_drive, backup_database_to_drive
+
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
