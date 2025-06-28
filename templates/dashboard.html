@@ -205,10 +205,10 @@
       <div class="portfolio-desc">{{ entry.description }}</div>
       <div class="portfolio-media">
         {% for img in entry.images %}
-          <img src="{{ img }}" class="portfolio-thumb" alt="Portfolio Image">
+          <img src="{{ img.url }}" class="portfolio-thumb" alt="Portfolio Image">
         {% endfor %}
         {% for vid in entry.videos %}
-          <video src="{{ vid }}" class="portfolio-thumb" controls></video>
+          <video src="{{ vid.url }}" class="portfolio-thumb" controls></video>
         {% endfor %}
       </div>
       <div class="entry-actions">
