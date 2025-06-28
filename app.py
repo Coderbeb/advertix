@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from functools import wraps
 import secrets
 import mimetypes
-from drive_utils import upload_to_drive, download_database_from_drive, backup_database_to_drive
+from drive_utils import upload_to_drive, download_database_from_drive, backup_database_to_drive, delete_file_from_drive
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
@@ -27,28 +27,20 @@ def allowed_file(filename):
 def init_db():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS blog (
-        id INTEGER PRIMARY KEY,
-        title TEXT,
-        content TEXT
-    )''')
-    c.execute('''CREATE TABLE IF NOT EXISTS portfolio (
-        id INTEGER PRIMARY KEY,
-        title TEXT,
-        description TEXT
-    )''')
+    c.execute('''CREATE TABLE IF NOT EXISTS blog (id INTEGER PRIMARY KEY, title TEXT, content TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS portfolio (id INTEGER PRIMARY KEY, title TEXT, description TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS portfolio_images (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         portfolio_id INTEGER,
         filename TEXT,
-        FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
-    )''')
+        file_id TEXT,
+        FOREIGN KEY (portfolio_id) REFERENCES portfolio(id))''')
     c.execute('''CREATE TABLE IF NOT EXISTS portfolio_videos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         portfolio_id INTEGER,
         filename TEXT,
-        FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
-    )''')
+        file_id TEXT,
+        FOREIGN KEY (portfolio_id) REFERENCES portfolio(id))''')
     conn.commit()
     conn.close()
 
@@ -71,8 +63,8 @@ def index():
     portfolios = c.execute('SELECT * FROM portfolio').fetchall()
     entries = []
     for p in portfolios:
-        images = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
-        videos = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
+        images = [dict(url=row['filename']) for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
+        videos = [dict(url=row['filename']) for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
         entries.append({
             'id': p['id'],
             'title': p['title'],
@@ -110,8 +102,8 @@ def dashboard():
     portfolios = c.execute("SELECT * FROM portfolio").fetchall()
     entries = []
     for p in portfolios:
-        images = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
-        videos = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
+        images = [dict(url=row['filename'], file_id=row['file_id']) for row in c.execute("SELECT * FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
+        videos = [dict(url=row['filename'], file_id=row['file_id']) for row in c.execute("SELECT * FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
         entries.append({
             'id': p['id'],
             'title': p['title'],
@@ -154,26 +146,26 @@ def add_portfolio():
     portfolio_id = c.lastrowid
 
     for media in images:
-        if media and media.filename and allowed_file(media.filename):
+        if media and allowed_file(media.filename):
             filename = secure_filename(media.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             media.save(filepath)
             mimetype, _ = mimetypes.guess_type(filepath)
-            url = upload_to_drive(filepath, filename, mimetype)
+            url, file_id = upload_to_drive(filepath, filename, mimetype)
             os.remove(filepath)
             if url:
-                c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, url))
+                c.execute("INSERT INTO portfolio_images (portfolio_id, filename, file_id) VALUES (?, ?, ?)", (portfolio_id, url, file_id))
 
     for media in videos:
-        if media and media.filename and allowed_file(media.filename):
+        if media and allowed_file(media.filename):
             filename = secure_filename(media.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             media.save(filepath)
             mimetype, _ = mimetypes.guess_type(filepath)
-            url = upload_to_drive(filepath, filename, mimetype)
+            url, file_id = upload_to_drive(filepath, filename, mimetype)
             os.remove(filepath)
             if url:
-                c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (portfolio_id, url))
+                c.execute("INSERT INTO portfolio_videos (portfolio_id, filename, file_id) VALUES (?, ?, ?)", (portfolio_id, url, file_id))
 
     conn.commit()
     conn.close()
@@ -196,6 +188,17 @@ def delete_blog(id):
 def delete_portfolio(id):
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
+
+    images = c.execute("SELECT file_id FROM portfolio_images WHERE portfolio_id=?", (id,)).fetchall()
+    for row in images:
+        if row[0]:
+            delete_file_from_drive(row[0])
+
+    videos = c.execute("SELECT file_id FROM portfolio_videos WHERE portfolio_id=?", (id,)).fetchall()
+    for row in videos:
+        if row[0]:
+            delete_file_from_drive(row[0])
+
     c.execute("DELETE FROM portfolio_images WHERE portfolio_id=?", (id,))
     c.execute("DELETE FROM portfolio_videos WHERE portfolio_id=?", (id,))
     c.execute("DELETE FROM portfolio WHERE id=?", (id,))
@@ -247,26 +250,26 @@ def edit_portfolio(id):
         c.execute("UPDATE portfolio SET title = ?, description = ? WHERE id = ?", (title, description, id))
 
         for media in images:
-            if media and media.filename and allowed_file(media.filename):
+            if media and allowed_file(media.filename):
                 filename = secure_filename(media.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 media.save(filepath)
                 mimetype, _ = mimetypes.guess_type(filepath)
-                url = upload_to_drive(filepath, filename, mimetype)
+                url, file_id = upload_to_drive(filepath, filename, mimetype)
                 os.remove(filepath)
                 if url:
-                    c.execute("INSERT INTO portfolio_images (portfolio_id, filename) VALUES (?, ?)", (id, url))
+                    c.execute("INSERT INTO portfolio_images (portfolio_id, filename, file_id) VALUES (?, ?, ?)", (id, url, file_id))
 
         for media in videos:
-            if media and media.filename and allowed_file(media.filename):
+            if media and allowed_file(media.filename):
                 filename = secure_filename(media.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 media.save(filepath)
                 mimetype, _ = mimetypes.guess_type(filepath)
-                url = upload_to_drive(filepath, filename, mimetype)
+                url, file_id = upload_to_drive(filepath, filename, mimetype)
                 os.remove(filepath)
                 if url:
-                    c.execute("INSERT INTO portfolio_videos (portfolio_id, filename) VALUES (?, ?)", (id, url))
+                    c.execute("INSERT INTO portfolio_videos (portfolio_id, filename, file_id) VALUES (?, ?, ?)", (id, url, file_id))
 
         conn.commit()
         conn.close()
@@ -274,30 +277,36 @@ def edit_portfolio(id):
         return redirect('/dashboard')
 
     portfolio = c.execute("SELECT * FROM portfolio WHERE id = ?", (id,)).fetchone()
-    images = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (id,))]
-    videos = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (id,))]
+    images = [row for row in c.execute("SELECT * FROM portfolio_images WHERE portfolio_id=?", (id,))]
+    videos = [row for row in c.execute("SELECT * FROM portfolio_videos WHERE portfolio_id=?", (id,))]
     conn.close()
     if not portfolio:
         return "Portfolio not found", 404
     return render_template('edit_portfolio.html', portfolio=portfolio, images=images, videos=videos)
 
-@app.route('/delete-portfolio-image/<int:portfolio_id>/<path:url>')
+@app.route('/delete-portfolio-image/<int:image_id>/<int:portfolio_id>')
 @login_required
-def delete_portfolio_image(portfolio_id, url):
+def delete_portfolio_image(image_id, portfolio_id):
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    c.execute("DELETE FROM portfolio_images WHERE portfolio_id=? AND filename=?", (portfolio_id, url))
+    file = c.execute("SELECT file_id FROM portfolio_images WHERE id=?", (image_id,)).fetchone()
+    if file and file[0]:
+        delete_file_from_drive(file[0])
+    c.execute("DELETE FROM portfolio_images WHERE id=?", (image_id,))
     conn.commit()
     conn.close()
     backup_database_to_drive()
     return redirect(url_for('edit_portfolio', id=portfolio_id))
 
-@app.route('/delete-portfolio-video/<int:portfolio_id>/<path:url>')
+@app.route('/delete-portfolio-video/<int:video_id>/<int:portfolio_id>')
 @login_required
-def delete_portfolio_video(portfolio_id, url):
+def delete_portfolio_video(video_id, portfolio_id):
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    c.execute("DELETE FROM portfolio_videos WHERE portfolio_id=? AND filename=?", (portfolio_id, url))
+    file = c.execute("SELECT file_id FROM portfolio_videos WHERE id=?", (video_id,)).fetchone()
+    if file and file[0]:
+        delete_file_from_drive(file[0])
+    c.execute("DELETE FROM portfolio_videos WHERE id=?", (video_id,))
     conn.commit()
     conn.close()
     backup_database_to_drive()

@@ -21,10 +21,11 @@ def get_drive_service():
         return None
 
 def upload_to_drive(filepath, filename, mimetype=None, folder_id=None):
+    """Upload a file to Google Drive and return (public_link, file_id)"""
     try:
         service = get_drive_service()
         if not service:
-            return None
+            return None, None
 
         file_metadata = {'name': filename}
         if folder_id:
@@ -46,10 +47,25 @@ def upload_to_drive(filepath, filename, mimetype=None, folder_id=None):
             body={'type': 'anyone', 'role': 'reader'},
         ).execute()
 
-        return f"https://drive.google.com/uc?id={file_id}"
+        # Return a displayable link and ID
+        public_url = f"https://drive.google.com/uc?export=view&id={file_id}"
+        return public_url, file_id
     except Exception as e:
         print(f"[Drive Upload Error] {e}")
-        return None
+        return None, None
+
+def delete_file_from_drive(file_id):
+    """Delete a file from Google Drive using its file ID"""
+    try:
+        service = get_drive_service()
+        if not service:
+            return False
+        service.files().delete(fileId=file_id).execute()
+        print(f"[Drive Delete] File ID {file_id} deleted.")
+        return True
+    except Exception as e:
+        print(f"[Drive Delete Error] {e}")
+        return False
 
 def find_file_by_name(filename):
     """Returns file ID from Google Drive matching the given name"""
