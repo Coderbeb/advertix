@@ -18,6 +18,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# Restore DB from Drive if missing
 if not os.path.exists(DATABASE):
     download_database_from_drive(DATABASE)
 
@@ -63,8 +64,8 @@ def index():
     portfolios = c.execute('SELECT * FROM portfolio').fetchall()
     entries = []
     for p in portfolios:
-        images = [dict(url=row['filename']) for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
-        videos = [dict(url=row['filename']) for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
+        images = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
+        videos = [row['filename'] for row in c.execute("SELECT filename FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
         entries.append({
             'id': p['id'],
             'title': p['title'],
@@ -102,8 +103,8 @@ def dashboard():
     portfolios = c.execute("SELECT * FROM portfolio").fetchall()
     entries = []
     for p in portfolios:
-        images = [dict(url=row['filename'], file_id=row['file_id']) for row in c.execute("SELECT * FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
-        videos = [dict(url=row['filename'], file_id=row['file_id']) for row in c.execute("SELECT * FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
+        images = [dict(url=row['filename'], file_id=row['file_id'], id=row['id']) for row in c.execute("SELECT * FROM portfolio_images WHERE portfolio_id=?", (p['id'],))]
+        videos = [dict(url=row['filename'], file_id=row['file_id'], id=row['id']) for row in c.execute("SELECT * FROM portfolio_videos WHERE portfolio_id=?", (p['id'],))]
         entries.append({
             'id': p['id'],
             'title': p['title'],
@@ -172,48 +173,12 @@ def add_portfolio():
     backup_database_to_drive()
     return redirect('/dashboard')
 
-@app.route('/delete-blog/<int:id>')
-@login_required
-def delete_blog(id):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute("DELETE FROM blog WHERE id = ?", (id,))
-    conn.commit()
-    conn.close()
-    backup_database_to_drive()
-    return redirect('/dashboard')
-
-@app.route('/delete-portfolio/<int:id>')
-@login_required
-def delete_portfolio(id):
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-
-    images = c.execute("SELECT file_id FROM portfolio_images WHERE portfolio_id=?", (id,)).fetchall()
-    for row in images:
-        if row[0]:
-            delete_file_from_drive(row[0])
-
-    videos = c.execute("SELECT file_id FROM portfolio_videos WHERE portfolio_id=?", (id,)).fetchall()
-    for row in videos:
-        if row[0]:
-            delete_file_from_drive(row[0])
-
-    c.execute("DELETE FROM portfolio_images WHERE portfolio_id=?", (id,))
-    c.execute("DELETE FROM portfolio_videos WHERE portfolio_id=?", (id,))
-    c.execute("DELETE FROM portfolio WHERE id=?", (id,))
-    conn.commit()
-    conn.close()
-    backup_database_to_drive()
-    return redirect('/dashboard')
-
 @app.route('/edit-blog/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_blog(id):
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
-
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('content')
@@ -224,7 +189,6 @@ def edit_blog(id):
         conn.close()
         backup_database_to_drive()
         return redirect('/dashboard')
-
     blog = c.execute("SELECT * FROM blog WHERE id = ?", (id,)).fetchone()
     conn.close()
     if not blog:
@@ -237,18 +201,14 @@ def edit_portfolio(id):
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
-
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
         images = request.files.getlist('images')
         videos = request.files.getlist('videos')
-
         if not title or not description:
             return "Title and description required", 400
-
         c.execute("UPDATE portfolio SET title = ?, description = ? WHERE id = ?", (title, description, id))
-
         for media in images:
             if media and allowed_file(media.filename):
                 filename = secure_filename(media.filename)
@@ -259,7 +219,6 @@ def edit_portfolio(id):
                 os.remove(filepath)
                 if url:
                     c.execute("INSERT INTO portfolio_images (portfolio_id, filename, file_id) VALUES (?, ?, ?)", (id, url, file_id))
-
         for media in videos:
             if media and allowed_file(media.filename):
                 filename = secure_filename(media.filename)
@@ -270,15 +229,13 @@ def edit_portfolio(id):
                 os.remove(filepath)
                 if url:
                     c.execute("INSERT INTO portfolio_videos (portfolio_id, filename, file_id) VALUES (?, ?, ?)", (id, url, file_id))
-
         conn.commit()
         conn.close()
         backup_database_to_drive()
         return redirect('/dashboard')
-
     portfolio = c.execute("SELECT * FROM portfolio WHERE id = ?", (id,)).fetchone()
-    images = [row for row in c.execute("SELECT * FROM portfolio_images WHERE portfolio_id=?", (id,))]
-    videos = [row for row in c.execute("SELECT * FROM portfolio_videos WHERE portfolio_id=?", (id,))]
+    images = c.execute("SELECT * FROM portfolio_images WHERE portfolio_id=?", (id,)).fetchall()
+    videos = c.execute("SELECT * FROM portfolio_videos WHERE portfolio_id=?", (id,)).fetchall()
     conn.close()
     if not portfolio:
         return "Portfolio not found", 404
@@ -311,6 +268,38 @@ def delete_portfolio_video(video_id, portfolio_id):
     conn.close()
     backup_database_to_drive()
     return redirect(url_for('edit_portfolio', id=portfolio_id))
+
+@app.route('/delete-portfolio/<int:id>')
+@login_required
+def delete_portfolio(id):
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    images = c.execute("SELECT file_id FROM portfolio_images WHERE portfolio_id=?", (id,)).fetchall()
+    for row in images:
+        if row[0]:
+            delete_file_from_drive(row[0])
+    videos = c.execute("SELECT file_id FROM portfolio_videos WHERE portfolio_id=?", (id,)).fetchall()
+    for row in videos:
+        if row[0]:
+            delete_file_from_drive(row[0])
+    c.execute("DELETE FROM portfolio_images WHERE portfolio_id=?", (id,))
+    c.execute("DELETE FROM portfolio_videos WHERE portfolio_id=?", (id,))
+    c.execute("DELETE FROM portfolio WHERE id=?", (id,))
+    conn.commit()
+    conn.close()
+    backup_database_to_drive()
+    return redirect('/dashboard')
+
+@app.route('/delete-blog/<int:id>')
+@login_required
+def delete_blog(id):
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute("DELETE FROM blog WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    backup_database_to_drive()
+    return redirect('/dashboard')
 
 if __name__ == '__main__':
     app.run(debug=True)

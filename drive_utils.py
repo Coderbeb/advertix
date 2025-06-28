@@ -1,14 +1,19 @@
 import os
 import io
-import requests
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 
-# Google Drive API scope
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
-SERVICE_ACCOUNT_FILE = 'credentials.json'
+# Path to service account credentials
+SERVICE_ACCOUNT_FILE = 'advertixdrive-b374842cc0c6.json'
+SCOPES = ['https://www.googleapis.com/auth/drive']
+
+# Google Drive folder ID for backup/uploads
+DRIVE_FOLDER_ID = '1ltiyKEsuxsOJRE39HUrAlOY-IEehdwjx'
+
+# File name of the database on Drive
 BACKUP_DB_FILENAME = 'database.db'
+
 
 def get_drive_service():
     try:
@@ -20,8 +25,8 @@ def get_drive_service():
         print(f"[Drive Auth Error] Could not initialize Drive service: {e}")
         return None
 
-def upload_to_drive(filepath, filename, mimetype=None, folder_id=None):
-    """Upload a file to Google Drive and return (public_link, file_id)"""
+
+def upload_to_drive(filepath, filename, mimetype=None, folder_id=DRIVE_FOLDER_ID):
     try:
         service = get_drive_service()
         if not service:
@@ -47,28 +52,26 @@ def upload_to_drive(filepath, filename, mimetype=None, folder_id=None):
             body={'type': 'anyone', 'role': 'reader'},
         ).execute()
 
-        # Return a displayable link and ID
         public_url = f"https://drive.google.com/uc?export=view&id={file_id}"
         return public_url, file_id
     except Exception as e:
         print(f"[Drive Upload Error] {e}")
         return None, None
 
+
 def delete_file_from_drive(file_id):
-    """Delete a file from Google Drive using its file ID"""
     try:
         service = get_drive_service()
         if not service:
             return False
         service.files().delete(fileId=file_id).execute()
-        print(f"[Drive Delete] File ID {file_id} deleted.")
         return True
     except Exception as e:
         print(f"[Drive Delete Error] {e}")
         return False
 
+
 def find_file_by_name(filename):
-    """Returns file ID from Google Drive matching the given name"""
     try:
         service = get_drive_service()
         if not service:
@@ -83,8 +86,8 @@ def find_file_by_name(filename):
         print(f"[Drive Find Error] {e}")
         return None
 
+
 def download_database_from_drive(local_path='database.db'):
-    """Download latest database.db from Drive if it exists"""
     try:
         service = get_drive_service()
         file_id = find_file_by_name(BACKUP_DB_FILENAME)
@@ -104,8 +107,8 @@ def download_database_from_drive(local_path='database.db'):
         print(f"[Drive Restore Error] {e}")
         return False
 
+
 def backup_database_to_drive():
-    """Upload the current database.db to Google Drive"""
     try:
         filepath = BACKUP_DB_FILENAME
         mimetype = 'application/x-sqlite3'
