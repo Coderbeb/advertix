@@ -4,40 +4,37 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 
-# Path to service account credentials
-SERVICE_ACCOUNT_FILE = 'advertixdrive-b374842cc0c6.json'
-SCOPES = ['https://www.googleapis.com/auth/drive']
-
-# Google Drive folder ID for backup/uploads
-DRIVE_FOLDER_ID = '1ltiyKEsuxsOJRE39HUrAlOY-IEehdwjx'
-
-# File name of the database on Drive
+# Correct path for Render secret file
+SERVICE_ACCOUNT_FILE = '/etc/secrets/credentials.json'
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
 BACKUP_DB_FILENAME = 'database.db'
-
+UPLOAD_FOLDER_ID = '1ltiyKEsuxsOJRE39HUrAlOY-IEehdwjx'  # Your shared folder
 
 def get_drive_service():
     try:
+        if not os.path.exists(SERVICE_ACCOUNT_FILE):
+            print(f"[Drive Error] Missing credentials file: {SERVICE_ACCOUNT_FILE}")
+            return None
         credentials = service_account.Credentials.from_service_account_file(
             SERVICE_ACCOUNT_FILE, scopes=SCOPES
         )
         return build('drive', 'v3', credentials=credentials)
     except Exception as e:
-        print(f"[Drive Auth Error] Could not initialize Drive service: {e}")
+        print(f"[Drive Auth Error] {e}")
         return None
 
-
-def upload_to_drive(filepath, filename, mimetype=None, folder_id=DRIVE_FOLDER_ID):
+def upload_to_drive(filepath, filename, mimetype=None):
     try:
         service = get_drive_service()
         if not service:
             return None, None
 
-        file_metadata = {'name': filename}
-        if folder_id:
-            file_metadata['parents'] = [folder_id]
+        file_metadata = {
+            'name': filename,
+            'parents': [UPLOAD_FOLDER_ID]
+        }
 
         media = MediaIoBaseUpload(io.FileIO(filepath, 'rb'), mimetype=mimetype)
-
         uploaded_file = service.files().create(
             body=file_metadata,
             media_body=media,
@@ -46,7 +43,6 @@ def upload_to_drive(filepath, filename, mimetype=None, folder_id=DRIVE_FOLDER_ID
 
         file_id = uploaded_file.get('id')
 
-        # Make file public
         service.permissions().create(
             fileId=file_id,
             body={'type': 'anyone', 'role': 'reader'},
@@ -58,7 +54,6 @@ def upload_to_drive(filepath, filename, mimetype=None, folder_id=DRIVE_FOLDER_ID
         print(f"[Drive Upload Error] {e}")
         return None, None
 
-
 def delete_file_from_drive(file_id):
     try:
         service = get_drive_service()
@@ -69,7 +64,6 @@ def delete_file_from_drive(file_id):
     except Exception as e:
         print(f"[Drive Delete Error] {e}")
         return False
-
 
 def find_file_by_name(filename):
     try:
@@ -86,27 +80,24 @@ def find_file_by_name(filename):
         print(f"[Drive Find Error] {e}")
         return None
 
-
 def download_database_from_drive(local_path='database.db'):
     try:
         service = get_drive_service()
         file_id = find_file_by_name(BACKUP_DB_FILENAME)
         if not file_id:
-            print("[Drive Restore] No database backup found on Drive.")
+            print("[Drive Restore] No backup found.")
             return False
-
         request = service.files().get_media(fileId=file_id)
         fh = io.FileIO(local_path, 'wb')
         downloader = MediaIoBaseDownload(fh, request)
         done = False
         while not done:
             status, done = downloader.next_chunk()
-        print("[Drive Restore] Database downloaded successfully.")
+        print("[Drive Restore] Downloaded database.")
         return True
     except Exception as e:
         print(f"[Drive Restore Error] {e}")
         return False
-
 
 def backup_database_to_drive():
     try:
@@ -123,10 +114,10 @@ def backup_database_to_drive():
                 fileId=file_id,
                 media_body=media
             ).execute()
-            print("[Drive Backup] Database updated on Drive.")
+            print("[Drive Backup] Updated existing backup.")
         else:
             upload_to_drive(filepath, BACKUP_DB_FILENAME, mimetype)
-            print("[Drive Backup] New database uploaded to Drive.")
+            print("[Drive Backup] Uploaded new database.")
         return True
     except Exception as e:
         print(f"[Drive Backup Error] {e}")
