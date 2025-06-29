@@ -138,10 +138,10 @@
           <div class="portfolio-desc">{{ entry.description }}</div>
           <div class="portfolio-media">
             {% for img in entry.images %}
-              <img src="{{ img }}" class="portfolio-thumb" alt="Portfolio Image" onclick="openModal(this.src)">
+              <img src="{{ img.url }}" class="portfolio-thumb" alt="Portfolio Image" onclick="openModal(this.src)">
             {% endfor %}
             {% for vid in entry.videos %}
-              <video src="{{ vid }}" class="portfolio-thumb" controls onclick="openModal(this.src, true)"></video>
+              <video src="{{ vid.url }}" class="portfolio-thumb" controls onclick="openModal(this.src, true)"></video>
             {% endfor %}
           </div>
         </div>

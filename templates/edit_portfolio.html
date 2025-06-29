@@ -141,8 +141,8 @@
       <div class="portfolio-media">
         {% for img in images %}
           <div class="media-item">
-            <img src="{{ img }}" class="portfolio-thumb" alt="Portfolio Image">
-            <a href="/delete-portfolio-image/{{ portfolio.id }}/{{ img }}" class="media-delete-btn" title="Delete Image" onclick="return confirm('Delete this image?');">&times;</a>
+            <img src="{{ img.url }}" class="portfolio-thumb" alt="Portfolio Image">
+            <a href="/delete-portfolio-image/{{ portfolio.id }}/{{ img.url }}" class="media-delete-btn" title="Delete Image" onclick="return confirm('Delete this image?');">&times;</a>
           </div>
         {% endfor %}
         {% if images|length == 0 %}
@@ -157,8 +157,8 @@
       <div class="portfolio-media">
         {% for vid in videos %}
           <div class="media-item">
-            <video src="{{ vid }}" class="portfolio-thumb" controls></video>
-            <a href="/delete-portfolio-video/{{ portfolio.id }}/{{ vid }}" class="media-delete-btn" title="Delete Video" onclick="return confirm('Delete this video?');">&times;</a>
+            <video src="{{ vid.url }}" class="portfolio-thumb" controls></video>
+            <a href="/delete-portfolio-video/{{ portfolio.id }}/{{ vid.url }}" class="media-delete-btn" title="Delete Video" onclick="return confirm('Delete this video?');">&times;</a>
           </div>
         {% endfor %}
         {% if videos|length == 0 %}
