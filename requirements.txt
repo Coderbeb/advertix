@@ -1,9 +1,8 @@
-flask==2.3.2
+flask
 gunicorn
-werkzeug
-
-# Google Drive API dependencies
+flask-cors
 google-api-python-client
-google-auth
 google-auth-httplib2
 google-auth-oauthlib
+werkzeug
+google-auth
