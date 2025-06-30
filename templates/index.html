@@ -42,16 +42,13 @@
   </style>
 </head>
 <body>
-
   <!-- Header -->
   <header>
     <div class="logo">
       <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Advertix Logo" />
       <h1>Advertix</h1>
     </div>
-
     <div class="hamburger" onclick="toggleMenu()">☰</div>
-
     <nav id="nav-links">
       <ul>
         <li><a href="#home">Home</a></li>
@@ -138,19 +135,18 @@
           <div class="portfolio-desc">{{ entry.description }}</div>
           <div class="portfolio-media">
             {% for img in entry.images %}
-              <img src="{{ img.url }}" class="portfolio-thumb" alt="Portfolio Image" onclick="openModal(this.src)">
+              <img src="{{ img }}" class="portfolio-thumb" alt="Portfolio Image" onclick="openModal(this.src)">
             {% endfor %}
             {% for vid in entry.videos %}
-              <video src="{{ vid.url }}" class="portfolio-thumb" controls onclick="openModal(this.src, true)"></video>
+              <video src="{{ vid }}" class="portfolio-thumb" controls onclick="openModal(this.src, true)"></video>
             {% endfor %}
           </div>
         </div>
       {% endfor %}
     </div>
-
     <!-- Modal for enlarged view -->
     <div id="mediaModal" class="modal" onclick="closeModal()">
-      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <span class="modal-close" onclick="closeModal()">×</span>
       <div style="display:flex;justify-content:center;align-items:center;height:100%;">
         <img id="modalImg" class="modal-content" style="display:none;">
         <video id="modalVid" class="modal-content" style="display:none;" controls></video>
@@ -214,7 +210,6 @@
     function toggleMenu() {
       document.getElementById('nav-links').classList.toggle('open');
     }
-
     function openModal(src, isVideo = false) {
       document.getElementById('mediaModal').style.display = 'flex';
       if (isVideo) {
@@ -227,13 +222,11 @@
         document.getElementById('modalVid').style.display = 'none';
       }
     }
-
     function closeModal() {
       document.getElementById('mediaModal').style.display = 'none';
       document.getElementById('modalImg').src = '';
       document.getElementById('modalVid').src = '';
     }
   </script>
-
 </body>
 </html>
